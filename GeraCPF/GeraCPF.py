@@ -23,8 +23,8 @@ def gera_cpf(**params):
             rnd.randint(0, 9),
             rnd.randint(0, 9),
             rnd.randint(0, 9),
-            # rnd.randint(0, 9)
-            8
+            rnd.randint(0, 9)
+            
 
         ]
 
@@ -61,7 +61,7 @@ oldtime = time.time()
 
 pode_sair = False
 
-digits = 7
+digits = 9
 
 while pode_sair == False:
 # while gera_cpf() != "25632071855":
