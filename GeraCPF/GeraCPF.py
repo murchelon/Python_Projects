@@ -24,7 +24,7 @@ def gera_cpf(**params):
             rnd.randint(0, 9),
             rnd.randint(0, 9),
             rnd.randint(0, 9)
-            
+
 
         ]
 
