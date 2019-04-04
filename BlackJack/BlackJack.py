@@ -1,3 +1,6 @@
+# BlackJack ML 0.1
+
+
 import random as rnd
 
 
