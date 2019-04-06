@@ -1,24 +1,32 @@
 # BlackJack ML 0.1
 
-
+from time import sleep, time
 import random as rnd
 
+from bib_support import print_inline, ls, get_card_val
 
-gDebugMode = True
+from BlackJack_Alg import blackjack_alg_50X50, blackjack_alg_WIKIPEDIA_BLACKJACK, blackjack_alg_MURCH, blackjack_alg_SIMPLE
+
+
 
 
 
 class GamePlayer:
 
-    def __init__(self, _name: str, _type: str = "PLAYER", _algoritm: str = "LUCKY", _cards: list = []):
+    def __init__(self, _name: str, _type: str = "PLAYER", _algoritm: str = "50X50", _cards: list = [], _known_table_cards: list = []):
         self.name = _name
         self.type = _type
         self.cards = _cards
         self.algoritm = _algoritm
+        self.known_table_cards = _known_table_cards
 
+    def hit(self, _deck_used: list, _card: list = []) -> None:
 
-    def hit(self, _card: list) -> None:
-        self.cards.append(_card)
+        if _card == []:
+            self.cards.append(get_card_from_deck(_deck_used))            
+        else:
+            self.cards.append(_card)
+        
 
     def print_hand(self) -> list:
 
@@ -35,7 +43,14 @@ class GamePlayer:
         num_of_aces = len( [ x[0] for x in self.cards if x[0] == "A" ] )
 
         if num_of_aces <= 1:
+
             value_for_ace = 11
+
+            for card in self.cards:
+
+                if get_card_val(card[0]) >= 11:
+                    value_for_ace = 1
+
         else:
             value_for_ace = 1
 
@@ -55,32 +70,56 @@ class GamePlayer:
 
     def should_hit(self, _force: bool = None) -> bool:
 
+        ret = False
+
         if _force is None:
 
-            if self.algoritm not in ["LUCKY", "MAGIC", "NEVER", "ALWAYS"]:
-                self.algoritm = "LUCKY"
+            if self.algoritm not in ["NEVER", "ALWAYS", "50X50", "WIKIPEDIA_BLACKJACK", "MURCH"]:
+                self.algoritm = "50X50"
 
 
 
-            if self.algoritm == "LUCKY":
+            if self.algoritm == "50X50":
+                ret = blackjack_alg_50X50()
 
-                if rnd.randint(0, 1) == 0:
-                    return False
-                else:
-                    return True
+            elif self.algoritm == "WIKIPEDIA_BLACKJACK":
+                ret = blackjack_alg_WIKIPEDIA_BLACKJACK(self)
 
+
+            elif self.algoritm == "MURCH":
+                ret = blackjack_alg_MURCH(self)
+
+            elif self.algoritm == "SIMPLE":
+                ret = blackjack_alg_SIMPLE()
 
             elif self.algoritm == "NEVER":
-                return False
+                ret = False
 
             elif self.algoritm == "ALWAYS":
-                return True
+                ret = True
 
-            elif self.algoritm == "MAGIC":
-                pass
+
+
+
+            # if its the table, the rules says it must hit if has 16 or less
+            if self.type == "TABLE":
+                if self.algoritm not in ["NEVER", "ALWAYS"]:
+                    if self.get_card_sum() <= 16:
+                        ret = True
+                    
+
+            # if has 21 or more, always say no to hit
+            if self.get_card_sum() >= 21:
+                if self.algoritm not in ["NEVER", "ALWAYS"]:
+                    ret = False
+
+
+            return ret
 
         else:
             return _force
+
+            
 
 def get_card_from_deck(deck: list, forceValue: str = None) -> list:
     if forceValue is None:
@@ -89,43 +128,8 @@ def get_card_from_deck(deck: list, forceValue: str = None) -> list:
         return [forceValue, "♥"]
 
 
-def get_card_val(card: str) -> int:
-    """
-    gets the value from a card. A = 1, figures = 10 and other are their numbers
 
-    :param card:
-    :return: int
-    """
-
-
-    if card[0] == "A":
-        return 1
-
-    elif card[0] == "J":
-        return 11
-
-    elif card[0] == "Q":
-        return 12
-
-    elif card[0] == "K":
-        return 13
-
-    else:
-        return int(card)
-
-
-def ls(val_to_print, *args) -> None:
-    """
-    helper function to print log mesagens on the terminal only if log mode is on
-    :param val_to_print:
-    :param args:
-    :return:
-    """
-    if gDebugMode == True: print(val_to_print, *args)
-
-
-
-def new_deck(shuffled: bool = True) -> list:
+def new_deck(shuffled: bool = True, number_of_decks_used: int = 1) -> list:
 
     # _deck = [ ["A", "OUROS"], ["7", "ESPADAS"] ]
 
@@ -134,30 +138,42 @@ def new_deck(shuffled: bool = True) -> list:
     # suits = ["OUROS", "ESPADAS", "COPAS", "PAUS"] # ♥♦♣♠
     suits = ["♦", "♠", "♥", "♣"] # ♥♦♣♠
 
-    deck = [[value, suit] for value in values for suit in suits]
+    deck_final = []
+
+    for x in range(1, number_of_decks_used + 1):
+        deck = [[value, suit] for value in values for suit in suits]
+
+        deck_final = deck_final + deck
 
     if shuffled == True:
-        rnd.shuffle(deck)
+        rnd.shuffle(deck_final)
 
-    return deck
+    return deck_final
 
 
 
 
 def run_match(deck: list) -> str:
 
-    if rnd.randint(0, 1) == 0:
-        winner = "PLAYER"
-    else:
-        winner = "TABLE"
 
 
 
-    # Define player and table
-    player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
-    # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck, "A"), get_card_from_deck(deck, "A") ])
-    table = GamePlayer(_name = "Blacu Jacku", _cards = [ get_card_from_deck(deck) ], _type = "TABLE")
+    winner = ""
 
+
+
+
+    player = GamePlayer(_name = "Murch", _algoritm = "WIKIPEDIA_BLACKJACK", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
+    # player = GamePlayer(_name="Murch", _algoritm = "MURCH", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
+    # player = GamePlayer(_name="Murch", _algoritm = "SIMPLE", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
+    # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
+    # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck, "K"), get_card_from_deck(deck, "8") ])
+
+
+    table = GamePlayer(_name = "Blacu Jacku", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ], _type = "TABLE")
+
+    # Table reveals their first card:
+    player.known_table_cards = table.cards[0]
 
 
     ls("=== MATCH ===========================================")
@@ -168,47 +184,58 @@ def run_match(deck: list) -> str:
 
 
     
+    turn = "PLAYER"
 
-
-
-
-    check_hit = player.should_hit()
-
-    ls("PLAYER: check_hit =", check_hit, "| Cartas: ", player.print_hand(), player.get_card_sum())
-
-
-
-    while check_hit == True:
-
-        player.hit(get_card_from_deck(deck))
+    while turn == "PLAYER":
 
         check_hit = player.should_hit()
 
+        if check_hit == True:
+            player.hit(deck)
+
         ls("PLAYER: check_hit =", check_hit, "| Cartas: ", player.print_hand(), player.get_card_sum())
 
+        if player.get_card_sum() > 21:
+            turn = "END"
+            winner = "TABLE"
+            ls("player exploded!")
 
+        else:
+            if check_hit == False:
+                turn = "TABLE"
 
-
-    ls("-----------------------------------------------------")
-
-
-    check_hit = table.should_hit()
-
-    ls("TABLE: check_hit =", check_hit, "| Cartas: ", table.print_hand(), table.get_card_sum())
-
-    while check_hit == True:
-        table.hit(get_card_from_deck(deck))
+    while turn == "TABLE":
 
         check_hit = table.should_hit()
+
+        if check_hit == True:
+            table.hit(deck)
+
         ls("TABLE: check_hit =", check_hit, "| Cartas: ", table.print_hand(), table.get_card_sum())
 
-    ls("-----------------------------------------------------")
+        if table.get_card_sum() > 21:
+            turn = "END"
+            winner = "PLAYER"
+            ls("table exploded!")
+
+        else:
+            if check_hit == False:
+                turn = "END"
 
 
+        # ls("-----------------------------------------------------")
+
+
+    if winner == "":
+        if table.get_card_sum() >= player.get_card_sum():
+            winner = "TABLE"
+        else:
+            winner = "PLAYER"
 
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
     ls("Table  FINAL hand:", table.print_hand(), table.get_card_sum())
+    ls("WINNER:", winner)
 
     ls("=== FINAL ===========================================")
 
@@ -232,13 +259,22 @@ def simulate_matches(num_matches = 1) -> tuple:
     total_win_player = 0
     total_win_table = 0
 
+    number_of_decks = 4
+
+    current_deck = new_deck(number_of_decks_used = number_of_decks)  # according to the rules, 8 decks are used
+
+    print ("Simulating", num_matches, "matches...")
 
     for x in range(0, num_matches):
 
-        current_deck = new_deck()
+        # if there are less then 20 cards in deck, get new decks
+        if len(current_deck) <= 20:
+            current_deck = new_deck(number_of_decks_used = number_of_decks)
 
         # print(current_deck)
 
+        # as the rules say, shuffle after every match
+        rnd.shuffle(current_deck)
 
         winner = run_match(current_deck)
 
@@ -247,6 +283,16 @@ def simulate_matches(num_matches = 1) -> tuple:
         else:
             total_win_table = total_win_table + 1
 
+        if x > 9:
+            win_ratio_player = (total_win_player * 100) / x
+            win_ratio_table = 100 - win_ratio_player
+
+            line = "Real time: Win Ratio in " + str(x + 1) + " games (player x table): " + str(round(win_ratio_player, 5)) + ", " + str(round(win_ratio_table, 5)) + " -- Deck size: " + str(len(current_deck))
+            print_inline(line)
+            # print (line)
+
+    if num_matches > 10:
+        print("")
 
     win_ratio_player = (total_win_player * 100) / num_matches
     win_ratio_table = 100 - win_ratio_player
@@ -258,17 +304,23 @@ def Main() -> None:
     Main function
     """
 
-    num_matches = 10
+    num_matches = 30000
+
+    before_time = time()
 
     win_ratio = simulate_matches(num_matches)
 
+    after_time = time()
+
+
+
     print("Win Ratio in", num_matches, "games (player x table): ", win_ratio)
+    print("Total time: ", after_time - before_time, "seconds")
 
-
-
-    pass
 
 
 
 if __name__ == "__main__":
     Main()
+
+
