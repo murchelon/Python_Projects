@@ -5,7 +5,6 @@ from sys import stdout
 gDebugMode = False
 
 
-
 def get_card_val(card: str) -> int:
     """
     gets the value from a card. A = 1, figures = 10 and other are their numbers
@@ -13,7 +12,6 @@ def get_card_val(card: str) -> int:
     :param card:
     :return: int
     """
-
 
     if card[0] == "A":
         return 1
@@ -31,7 +29,6 @@ def get_card_val(card: str) -> int:
         return int(card)
 
 
-
 def ls(val_to_print, *args) -> None:
     """
     helper function to print log mesagens on the terminal only if log mode is on
@@ -39,7 +36,8 @@ def ls(val_to_print, *args) -> None:
     :param args:
     :return:
     """
-    if gDebugMode == True: print(val_to_print, *args)
+    if gDebugMode == True:
+        print(val_to_print, *args)
 
 
 def print_inline(data: str, newline: bool = False) -> None:
