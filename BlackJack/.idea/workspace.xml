@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bc13020c-68e4-4ac6-a07c-fa3f08859b3f" name="Default Changelist" comment="" />
+    <list default="true" id="bc13020c-68e4-4ac6-a07c-fa3f08859b3f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/BlackJack.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlackJack.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,11 +15,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BlackJack.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="106">
-              <caret line="183" lean-forward="true" selection-start-line="183" selection-end-line="183" />
+            <state relative-caret-position="182">
+              <caret line="282" column="24" selection-start-line="282" selection-start-column="24" selection-end-line="282" selection-end-column="24" />
               <folding>
-                <element signature="e#20#48#0" expanded="true" />
+                <element signature="e#21#41#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/bib_support.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="28" selection-start-line="28" selection-end-line="28" />
             </state>
           </provider>
         </entry>
@@ -25,7 +36,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="23">
+            <state relative-caret-position="2715">
               <caret line="183" column="19" selection-start-line="183" selection-start-column="19" selection-end-line="183" selection-end-column="19" />
               <folding>
                 <element signature="e#1#21#0" expanded="true" />
@@ -69,8 +80,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-14" />
+  <component name="ProjectFrameBounds">
     <option name="y" value="22" />
     <option name="width" value="1440" />
     <option name="height" value="874" />
@@ -187,16 +197,16 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="22" width="1440" height="818" extended-state="6" />
+    <frame x="0" y="22" width="1440" height="874" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4986226" visible="true" weight="0.066243835" />
-      <window_info id="Structure" order="1" sideWeight="0.5013774" side_tool="true" visible="true" weight="0.066243835" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49636364" visible="true" weight="0.066243835" />
+      <window_info id="Structure" order="1" sideWeight="0.50363636" side_tool="true" visible="true" weight="0.066243835" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4982382" weight="0.29752067" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.2630854" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4982382" visible="true" weight="0.2966752" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.26214835" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49964765" weight="0.32992327" />
@@ -235,16 +245,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bib_support.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="16" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
+        <state relative-caret-position="2715">
           <caret line="183" column="19" selection-start-line="183" selection-start-column="19" selection-end-line="183" selection-end-column="19" />
           <folding>
             <element signature="e#1#21#0" expanded="true" />
@@ -252,12 +255,33 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9675">
+          <caret line="656" selection-start-line="656" selection-end-line="656" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/context.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="116" selection-start-line="116" selection-end-line="116" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bib_support.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" selection-start-line="28" selection-end-line="28" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/BlackJack.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="183" lean-forward="true" selection-start-line="183" selection-end-line="183" />
+        <state relative-caret-position="182">
+          <caret line="282" column="24" selection-start-line="282" selection-start-column="24" selection-end-line="282" selection-end-column="24" />
           <folding>
-            <element signature="e#20#48#0" expanded="true" />
+            <element signature="e#21#41#0" expanded="true" />
           </folding>
         </state>
       </provider>

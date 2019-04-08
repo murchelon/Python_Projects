@@ -1,10 +1,12 @@
 # BlackJack ML 0.1
 
-from time import sleep, time
+
 import random as rnd
+import multiprocessing
+
+from time import sleep, time
 
 from bib_support import print_inline, ls, get_card_val
-
 from BlackJack_Alg import blackjack_alg_50X50, blackjack_alg_WIKIPEDIA_BLACKJACK, blackjack_alg_MURCH, blackjack_alg_SIMPLE
 
 
@@ -219,16 +221,18 @@ def run_match(deck: list) -> str:
     return winner
 
 
-def simulate_matches(num_matches=1) -> tuple:
+# def simulate_matches(num_matches: int = 1, processing_mode: str = "NORMAL") -> tuple:
+def simulate_matches(params: list = [1, "NORMAL"]) -> tuple:
 
     total_win_player = 0
     total_win_table = 0
 
     number_of_decks = 4
 
-    current_deck = new_deck(number_of_decks_used=number_of_decks)  # according to the rules, 8 decks are used
+    num_matches = params[0]
+    processing_mode = params[1]
 
-    print("Simulating", num_matches, "matches...")
+    current_deck = new_deck(number_of_decks_used=number_of_decks)  # according to the rules, 8 decks are used
 
     for x in range(0, num_matches):
 
@@ -253,11 +257,13 @@ def simulate_matches(num_matches=1) -> tuple:
             win_ratio_table = 100 - win_ratio_player
 
             line = "Real time: Win Ratio in " + str(x + 1) + " games (player x table): " + str(round(win_ratio_player, 5)) + ", " + str(round(win_ratio_table, 5)) + " -- Deck size: " + str(len(current_deck))
-            print_inline(line)
-            # print (line)
+
+            if processing_mode in ["NORMAL"]:
+                print_inline(line)
 
     if num_matches > 10:
-        print("")
+        if processing_mode in ["NORMAL"]:
+            print("")
 
     win_ratio_player = (total_win_player * 100) / num_matches
     win_ratio_table = 100 - win_ratio_player
@@ -270,15 +276,49 @@ def Main() -> None:
     Main function
     """
 
-    num_matches = 30000
+    win_ratio_final = []
+
+    win_ratio_task = []
+
+    num_matches = 100000
+
+    processing_mode = "MULTIPROCESSING_POOL"     # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
+
+    max_num_tasks = 3  # 3 is the best after tests
+
+    print("Simulating", num_matches, "matches...")
 
     before_time = time()
 
-    win_ratio = simulate_matches(num_matches)
+    if processing_mode == "NORMAL":
+        win_ratio_task = [simulate_matches([num_matches, processing_mode])]
+
+        win_ratio_final = win_ratio_task[0]
+
+    elif processing_mode == "MULTIPROCESSING_PROC":
+        pass
+
+    elif processing_mode == "MULTIPROCESSING_POOL":
+
+        print_inline("Using multitaks. Calculating...")
+
+        num_matches_task = int(num_matches / max_num_tasks)
+
+        # print(num_matches_task)
+
+        pool = multiprocessing.Pool(processes=max_num_tasks)
+        win_ratio_task = pool.map(simulate_matches, [[num_matches_task, processing_mode] for _ in range(0, max_num_tasks)])
+
+        win_ratio_final = tuple(sum(y) / len(y) for y in zip(*win_ratio_task))
+
+        print("")
+
+    elif processing_mode == "MULTITHREADING":
+        pass
 
     after_time = time()
 
-    print("Win Ratio in", num_matches, "games (player x table): ", win_ratio)
+    print("Win Ratio in", num_matches, "games (player x table): ", win_ratio_final)
     print("Total time: ", after_time - before_time, "seconds")
 
 
