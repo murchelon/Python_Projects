@@ -140,7 +140,7 @@ class GamePlayer:
         else:
             return _force
 
-    def define_bet() -> float:
+    def define_bet(self) -> float:
         return 10
 
 
@@ -271,18 +271,18 @@ def run_match(deck: list, use_betting: bool = False) -> str:
         elif dealer.get_card_sum() > player.get_card_sum():
             winner = "DEALER"
 
-                if use_betting is True:
-                    dealer.final_money = dealer.final_money + player.actual_bet
-                    player.final_money = player.final_money - player.actual_bet
-                    player.actual_bet = 0
+            if use_betting is True:
+                dealer.final_money = dealer.final_money + player.actual_bet
+                player.final_money = player.final_money - player.actual_bet
+                player.actual_bet = 0
 
         elif dealer.get_card_sum() < player.get_card_sum():
             winner = "PLAYER"
 
-                if use_betting is True:
-                    dealer.final_money = dealer.final_money - player.actual_bet
-                    player.final_money = player.final_money + player.actual_bet
-                    player.actual_bet = 0
+            if use_betting is True:
+                dealer.final_money = dealer.final_money - player.actual_bet
+                player.final_money = player.final_money + player.actual_bet
+                player.actual_bet = 0
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
     ls("dealer  FINAL hand:", dealer.print_hand(), dealer.get_card_sum())
