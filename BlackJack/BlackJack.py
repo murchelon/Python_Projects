@@ -6,7 +6,6 @@
 # and show the statistics envolved.
 
 # Features:
-# - Player and Dealer as classes: Be able to spawn as many players as we want (never tryied. it probably has bugs. Always used 1 player x dealer)
 # - hability to use real decks with cards and suits
 # - Can use as many decks as desired in a given match
 # - The decks are consumed by each match and when its near exaustion,
@@ -16,18 +15,20 @@
 # - Possible to run tousands of simulations
 # - Multiprocessing(give a number of simulations to a process and create several processes)
 # - TODO: Implement double down, surrender, insurance, the amout payied for insurance, the amout payed by blackjack .. all in parameters
-# - TODO: Fix the order of the dealed cards. They have an order... and it must be followed
+# - DONE -- Fix the order of the dealed cards. They have an order... and it must be followed
 # - TODO: make this program be able to play against flash sites with bj games
 # - TODO: Implement spliting of cards
 # - TODO: Implement betting
-# - TODO: Implement push(tie, when neither the player or dealer wins. Today when there is a tie, the dealer wins)
+# - DONE -- Implement push(tie, when neither the player or dealer wins. Today when there is a tie, the dealer wins)
 # - TODO: Implement algorigm of Machine Learning (this is the main original goal)
-# - TODO: Implement algoritm of Card Counting(High-Low ? Must me able to do 2 types of CC: One like the real world and other with simulated real decks "in mind")
+# - TODO: Implement algoritm of Card Counting (Hi-Lo ? Must me able to do 2 types of CC: One like the real world and other with simulated real decks "in mind")
 # - TODO: Implement Multithreading to compare performance. Probably worse
 # - TODO: Implement Multiprocessing by NOT using a Pool .. to compare performance
 # - TODO: export lots os data and shit to use with Jupyter and Plot and Numby and etc
-# - TODO: Implement game against a human(1 and 2 players ?)
+# - TODO: Implement game against a human (1 and 2 players ?)
 # - TODO: Create a GUI ?
+# - TODO: Find a way to show progress when in multiprocessing mode
+# - TODO: Support more then 1 player.
 
 
 import random as rnd
@@ -169,16 +170,29 @@ def run_match(deck: list) -> str:
 
     winner = ""
 
-    player = GamePlayer(_name="Murch", _algoritm="WIKIPEDIA_BLACKJACK", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
+    # 1 - Players get 1 card
+    player = GamePlayer(_name="Murch", _algoritm="WIKIPEDIA_BLACKJACK", _cards=[get_card_from_deck(deck)])
+
+    # 2 - Dealer get 1 card face up
+    dealer = GamePlayer(_name="Blacu Jacku", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)], _type="DEALER")
+
+    # dealer reveals their first card to players
+    player.known_dealer_cards = dealer.cards[0]
+
+    # 3 - Players get 1 more card
+    player.hit(deck)
+
+    # 4 - Dealer get 1 more card face down
+    dealer.hit(deck)
+    
     # player = GamePlayer(_name="Murch", _algoritm = "MURCH", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name="Murch", _algoritm = "SIMPLE", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck, "K"), get_card_from_deck(deck, "8") ])
 
-    dealer = GamePlayer(_name="Blacu Jacku", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)], _type="DEALER")
+    
 
-    # dealer reveals their first card:
-    player.known_dealer_cards = dealer.cards[0]
+
 
     ls("=== MATCH ===========================================")
     ls("Player INIT hand:", player.print_hand(), player.get_card_sum())
@@ -227,9 +241,13 @@ def run_match(deck: list) -> str:
         # ls("-----------------------------------------------------")
 
     if winner == "":
-        if dealer.get_card_sum() >= player.get_card_sum():
+        if dealer.get_card_sum() == player.get_card_sum():
+            winner = "PUSH"
+
+        elif dealer.get_card_sum() > player.get_card_sum():
             winner = "DEALER"
-        else:
+
+        elif dealer.get_card_sum() < player.get_card_sum():
             winner = "PLAYER"
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
@@ -255,6 +273,7 @@ def simulate_matches(params: list = [1, "NORMAL"]) -> tuple:
 
     total_win_player = 0
     total_win_dealer = 0
+    total_win_push = 0
 
     number_of_decks = 6
 
@@ -278,14 +297,25 @@ def simulate_matches(params: list = [1, "NORMAL"]) -> tuple:
 
         if winner == "PLAYER":
             total_win_player = total_win_player + 1
-        else:
+
+        elif winner == "DEALER":
             total_win_dealer = total_win_dealer + 1
+
+        elif winner == "PUSH":
+            total_win_push = total_win_push + 1
 
         if x > 9:
             win_ratio_player = (total_win_player * 100) / x
-            win_ratio_dealer = 100 - win_ratio_player
+            win_ratio_dealer = (total_win_dealer * 100) / x
+            win_ratio_push = (total_win_push * 100) / x
 
-            line = "Real time: Win Ratio in " + str(x + 1) + " games (player x dealer): " + str(round(win_ratio_player, 5)) + ", " + str(round(win_ratio_dealer, 5)) + " -- Deck size: " + str(len(current_deck))
+            # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
+
+            line = "Real time: Win Ratio in " + "{:07d}".format(x + 1) + " games (player x dealer x push): " \
+                + "{:.8f}".format(win_ratio_player) + ", " \
+                + "{:.8f}".format(win_ratio_dealer) + ", " \
+                + "{:.8f}".format(win_ratio_push) \
+                + " -- Deck size: " + str(len(current_deck))
 
             if processing_mode in ["NORMAL"]:
                 print_inline(line)
@@ -295,9 +325,12 @@ def simulate_matches(params: list = [1, "NORMAL"]) -> tuple:
             print("")
 
     win_ratio_player = (total_win_player * 100) / num_matches
-    win_ratio_dealer = 100 - win_ratio_player
+    win_ratio_dealer = (total_win_dealer * 100) / num_matches
+    win_ratio_push = (total_win_push * 100) / num_matches
 
-    return win_ratio_player, win_ratio_dealer
+    # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
+
+    return win_ratio_player, win_ratio_dealer, win_ratio_push
 
 
 def Main() -> None:
@@ -309,9 +342,9 @@ def Main() -> None:
 
     win_ratio_task = []
 
-    num_matches = 1000000
+    num_matches = 1000
 
-    processing_mode = "MULTIPROCESSING_POOL"     # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
+    processing_mode = "NORMAL"     # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
 
     max_num_tasks = 3  # 3 is the best after tests
 
@@ -332,6 +365,8 @@ def Main() -> None:
         print_inline("Using multitaks. Calculating...")
 
         num_matches_task = int(num_matches / max_num_tasks)
+        if num_matches_task == 0:
+            num_matches_task = 1
 
         # print(num_matches_task)
 
@@ -347,7 +382,7 @@ def Main() -> None:
 
     after_time = time()
 
-    print("Win Ratio in", num_matches, "games (player x dealer): ", win_ratio_final)
+    print("Win Ratio in", num_matches, "games (player x dealer x push): ", win_ratio_final)
     print("Total time: ", after_time - before_time, "seconds")
 
 

@@ -22,7 +22,7 @@ def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
 
     card_sum = caller.get_card_sum()
 
-    known_table_card_value = get_card_val(caller.known_table_cards[0])
+    known_dealer_card_value = get_card_val(caller.known_dealer_cards[0])
 
     ret = None
 
@@ -46,12 +46,12 @@ def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
             if pair[1] >= 2:
 
                 if pair[0] == "2" or pair[0] == "3":
-                    if known_table_card_value in {1, 8, 9, 10}:
+                    if known_dealer_card_value in {1, 8, 9, 10}:
                         ret = True
                         found_pair_match = True
 
                 if pair[0] == "4":
-                    if known_table_card_value in {1, 2, 3, 4, 7, 8, 9, 10}:
+                    if known_dealer_card_value in {1, 2, 3, 4, 7, 8, 9, 10}:
                         ret = True
                         found_pair_match = True
 
@@ -60,17 +60,17 @@ def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
                     found_pair_match = True
 
                 if pair[0] == "6":
-                    if known_table_card_value in {1, 7, 8, 9, 10}:
+                    if known_dealer_card_value in {1, 7, 8, 9, 10}:
                         ret = True
                         found_pair_match = True
 
                 if pair[0] == "7":
-                    if known_table_card_value in {1, 8, 9, 10}:
+                    if known_dealer_card_value in {1, 8, 9, 10}:
                         ret = True
                         found_pair_match = True
 
                 if pair[0] == "9":
-                    if known_table_card_value in {1, 7, 10}:
+                    if known_dealer_card_value in {1, 7, 10}:
                         ret = False
                         found_pair_match = True
 
@@ -89,7 +89,7 @@ def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
                 found_total_match = True
 
             elif card_sum == 12:
-                if known_table_card_value >= 4 and known_table_card_value <= 6:
+                if known_dealer_card_value >= 4 and known_dealer_card_value <= 6:
                     ret = False
                 else:
                     ret = True
@@ -97,7 +97,7 @@ def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
                 found_total_match = True
 
             elif card_sum >= 13 and card_sum <= 16:
-                if known_table_card_value >= 2 and known_table_card_value <= 6:
+                if known_dealer_card_value >= 2 and known_dealer_card_value <= 6:
                     ret = False
                 else:
                     ret = True
@@ -116,7 +116,7 @@ def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
                 found_total_match = True
 
             elif card_sum == 18:
-                if known_table_card_value in {1, 9, 10}:
+                if known_dealer_card_value in {1, 9, 10}:
                     ret = True
                 else:
                     ret = False
@@ -147,14 +147,14 @@ def blackjack_alg_MURCH(caller: object) -> bool:
 
     card_sum = caller.get_card_sum()
 
-    known_table_card_value = get_card_val(caller.known_table_cards[0])
+    known_dealer_card_value = get_card_val(caller.known_dealer_cards[0])
 
     ret = None
 
     if card_sum <= 13:
         ret = True
     elif card_sum > 13 and card_sum <= 17:
-        if known_table_card_value == 1:
+        if known_dealer_card_value == 1:
             ret = True
         else:
             if card_sum <= 16:
