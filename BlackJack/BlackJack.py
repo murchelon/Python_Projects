@@ -1,4 +1,33 @@
-# BlackJack ML 0.1
+# BlackJack 0.2
+# =============
+
+# Blackjack game created to help me learn python.
+# The goal is make a program that can play by it's own
+# and show the statistics envolved.
+
+# Features:
+# - Player and Dealer as classes: Be able to spawn as many players as we want (never tryied. it probably has bugs. Always used 1 player x dealer)
+# - hability to use real decks with cards and suits
+# - Can use as many decks as desired in a given match
+# - The decks are consumed by each match and when its near exaustion,
+#   the dealer get new decks
+# - able to use different algoritms to decide if hit ot not
+# - can look to the cards in the dealer(player "sees" dealer hand)
+# - Possible to run tousands of simulations
+# - Multiprocessing(give a number of simulations to a process and create several processes)
+# - TODO: Implement double down, surrender, insurance, the amout payied for insurance, the amout payed by blackjack .. all in parameters
+# - TODO: Fix the order of the dealed cards. They have an order... and it must be followed
+# - TODO: make this program be able to play against flash sites with bj games
+# - TODO: Implement spliting of cards
+# - TODO: Implement betting
+# - TODO: Implement push(tie, when neither the player or dealer wins. Today when there is a tie, the dealer wins)
+# - TODO: Implement algorigm of Machine Learning (this is the main original goal)
+# - TODO: Implement algoritm of Card Counting(High-Low ? Must me able to do 2 types of CC: One like the real world and other with simulated real decks "in mind")
+# - TODO: Implement Multithreading to compare performance. Probably worse
+# - TODO: Implement Multiprocessing by NOT using a Pool .. to compare performance
+# - TODO: export lots os data and shit to use with Jupyter and Plot and Numby and etc
+# - TODO: Implement game against a human(1 and 2 players ?)
+# - TODO: Create a GUI ?
 
 
 import random as rnd
@@ -12,12 +41,12 @@ from BlackJack_Alg import blackjack_alg_50X50, blackjack_alg_WIKIPEDIA_BLACKJACK
 
 class GamePlayer:
 
-    def __init__(self, _name: str, _type: str = "PLAYER", _algoritm: str = "50X50", _cards: list = [], _known_table_cards: list = []):
+    def __init__(self, _name: str, _type: str = "PLAYER", _algoritm: str = "50X50", _cards: list = [], _known_dealer_cards: list = []):
         self.name = _name
         self.type = _type
         self.cards = _cards
         self.algoritm = _algoritm
-        self.known_table_cards = _known_table_cards
+        self.known_dealer_cards = _known_dealer_cards
 
     def hit(self, _deck_used: list, _card: list = []) -> None:
 
@@ -90,8 +119,8 @@ class GamePlayer:
             elif self.algoritm == "ALWAYS":
                 ret = True
 
-            # if its the table, the rules says it must hit if has 16 or less
-            if self.type == "TABLE":
+            # if its the dealer, the rules says it must hit if has 16 or less
+            if self.type == "DEALER":
                 if self.algoritm not in ["NEVER", "ALWAYS"]:
                     if self.get_card_sum() <= 16:
                         ret = True
@@ -146,14 +175,14 @@ def run_match(deck: list) -> str:
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck, "K"), get_card_from_deck(deck, "8") ])
 
-    table = GamePlayer(_name="Blacu Jacku", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)], _type="TABLE")
+    dealer = GamePlayer(_name="Blacu Jacku", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)], _type="DEALER")
 
-    # Table reveals their first card:
-    player.known_table_cards = table.cards[0]
+    # dealer reveals their first card:
+    player.known_dealer_cards = dealer.cards[0]
 
     ls("=== MATCH ===========================================")
     ls("Player INIT hand:", player.print_hand(), player.get_card_sum())
-    ls("Table  INIT hand:", table.print_hand(), table.get_card_sum())
+    ls("dealer  INIT hand:", dealer.print_hand(), dealer.get_card_sum())
 
     ls("-----------------------------------------------------")
 
@@ -163,48 +192,48 @@ def run_match(deck: list) -> str:
 
         check_hit = player.should_hit()
 
-        if check_hit == True:
+        if check_hit is True:
             player.hit(deck)
 
         ls("PLAYER: check_hit =", check_hit, "| Cartas: ", player.print_hand(), player.get_card_sum())
 
         if player.get_card_sum() > 21:
             turn = "END"
-            winner = "TABLE"
+            winner = "DEALER"
             ls("player exploded!")
 
         else:
-            if check_hit == False:
-                turn = "TABLE"
+            if check_hit is False:
+                turn = "DEALER"
 
-    while turn == "TABLE":
+    while turn == "DEALER":
 
-        check_hit = table.should_hit()
+        check_hit = dealer.should_hit()
 
-        if check_hit == True:
-            table.hit(deck)
+        if check_hit is True:
+            dealer.hit(deck)
 
-        ls("TABLE: check_hit =", check_hit, "| Cartas: ", table.print_hand(), table.get_card_sum())
+        ls("DEALER: check_hit =", check_hit, "| Cartas: ", dealer.print_hand(), dealer.get_card_sum())
 
-        if table.get_card_sum() > 21:
+        if dealer.get_card_sum() > 21:
             turn = "END"
             winner = "PLAYER"
-            ls("table exploded!")
+            ls("dealer exploded!")
 
         else:
-            if check_hit == False:
+            if check_hit is False:
                 turn = "END"
 
         # ls("-----------------------------------------------------")
 
     if winner == "":
-        if table.get_card_sum() >= player.get_card_sum():
-            winner = "TABLE"
+        if dealer.get_card_sum() >= player.get_card_sum():
+            winner = "DEALER"
         else:
             winner = "PLAYER"
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
-    ls("Table  FINAL hand:", table.print_hand(), table.get_card_sum())
+    ls("dealer  FINAL hand:", dealer.print_hand(), dealer.get_card_sum())
     ls("WINNER:", winner)
 
     ls("=== FINAL ===========================================")
@@ -225,9 +254,9 @@ def run_match(deck: list) -> str:
 def simulate_matches(params: list = [1, "NORMAL"]) -> tuple:
 
     total_win_player = 0
-    total_win_table = 0
+    total_win_dealer = 0
 
-    number_of_decks = 4
+    number_of_decks = 6
 
     num_matches = params[0]
     processing_mode = params[1]
@@ -250,13 +279,13 @@ def simulate_matches(params: list = [1, "NORMAL"]) -> tuple:
         if winner == "PLAYER":
             total_win_player = total_win_player + 1
         else:
-            total_win_table = total_win_table + 1
+            total_win_dealer = total_win_dealer + 1
 
         if x > 9:
             win_ratio_player = (total_win_player * 100) / x
-            win_ratio_table = 100 - win_ratio_player
+            win_ratio_dealer = 100 - win_ratio_player
 
-            line = "Real time: Win Ratio in " + str(x + 1) + " games (player x table): " + str(round(win_ratio_player, 5)) + ", " + str(round(win_ratio_table, 5)) + " -- Deck size: " + str(len(current_deck))
+            line = "Real time: Win Ratio in " + str(x + 1) + " games (player x dealer): " + str(round(win_ratio_player, 5)) + ", " + str(round(win_ratio_dealer, 5)) + " -- Deck size: " + str(len(current_deck))
 
             if processing_mode in ["NORMAL"]:
                 print_inline(line)
@@ -266,9 +295,9 @@ def simulate_matches(params: list = [1, "NORMAL"]) -> tuple:
             print("")
 
     win_ratio_player = (total_win_player * 100) / num_matches
-    win_ratio_table = 100 - win_ratio_player
+    win_ratio_dealer = 100 - win_ratio_player
 
-    return win_ratio_player, win_ratio_table
+    return win_ratio_player, win_ratio_dealer
 
 
 def Main() -> None:
@@ -280,7 +309,7 @@ def Main() -> None:
 
     win_ratio_task = []
 
-    num_matches = 100000
+    num_matches = 1000000
 
     processing_mode = "MULTIPROCESSING_POOL"     # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
 
@@ -318,7 +347,7 @@ def Main() -> None:
 
     after_time = time()
 
-    print("Win Ratio in", num_matches, "games (player x table): ", win_ratio_final)
+    print("Win Ratio in", num_matches, "games (player x dealer): ", win_ratio_final)
     print("Total time: ", after_time - before_time, "seconds")
 
 
