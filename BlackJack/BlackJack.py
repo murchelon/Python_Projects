@@ -35,11 +35,18 @@
 
 import random as rnd
 import multiprocessing
-
 from time import sleep, time
 
 from bib_support import print_inline, ls, get_card_val
 import BlackJack_Alg as alg
+
+
+# //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+# PARAMETERS
+#
+# //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 # Number of players playing the game against the dealer. Min 1, max > 1  :)
 ctNUM_PLAYERS = 1
@@ -172,9 +179,6 @@ class GamePlayer:
 
 
 def Main() -> None:
-    """
-    Main function
-    """
 
     print("Simulating", ctNUM_MATCHES, "matches...")
 
@@ -188,6 +192,9 @@ def Main() -> None:
 
 
 def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL", use_betting: bool = False, num_players: int = 1) -> None:
+    """
+    Main function to be called. Runs the entire simulation with the desired parameters
+    """
 
     max_num_tasks = 3  # 3 is the best after tests
 
@@ -226,8 +233,10 @@ def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL"
     print("Win Ratio in", ctNUM_MATCHES, "games (player x dealer x push): ", win_ratio_final)
 
 
-# def simulate_matches(num_matches: int = 1, processing_mode: str = "NORMAL") -> tuple:
 def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> tuple:
+    """
+    runs the entire desired number of matches
+    """
 
     total_win_player = 0
     total_win_dealer = 0
@@ -295,6 +304,9 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> tuple:
 
 
 def run_match(deck: list, use_betting: bool = False) -> str:
+    """
+    runs one match between a dealer and players, using the deck in place at the moment
+    """
 
     winner = ""
 
@@ -417,12 +429,12 @@ def run_match(deck: list, use_betting: bool = False) -> str:
 
 
 def new_deck(shuffled: bool = True, number_of_decks_used: int = 1) -> list:
-
-    # _deck = [ ["A", "OUROS"], ["7", "ESPADAS"] ]
+    """
+    return a number of new decks, complete, shuffled or not, as a list
+    """
 
     values = [str(x) for x in range(2, 11)] + ["J", "Q", "K", "A"]
 
-    # suits = ["OUROS", "ESPADAS", "COPAS", "PAUS"] # ♥♦♣♠
     suits = ["♦", "♠", "♥", "♣"]  # ♥♦♣♠
 
     deck_final = []
@@ -439,6 +451,10 @@ def new_deck(shuffled: bool = True, number_of_decks_used: int = 1) -> list:
 
 
 def get_card_from_deck(deck: list, forceValue: str = None) -> list:
+    """
+    hummm ... get a new card from the deck ?
+    """
+
     if forceValue is None:
         return deck.pop()
     else:
