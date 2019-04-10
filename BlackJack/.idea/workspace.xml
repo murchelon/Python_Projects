@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="bc13020c-68e4-4ac6-a07c-fa3f08859b3f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/BlackJack.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlackJack.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlackJack_Alg.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlackJack_Alg.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,10 +15,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BlackJack.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1833">
-              <caret line="299" selection-start-line="299" selection-end-line="299" />
+            <state relative-caret-position="338">
+              <caret line="445" lean-forward="true" selection-start-line="445" selection-end-line="445" />
               <folding>
-                <element signature="e#1900#1920#0" expanded="true" />
+                <element signature="e#1981#2001#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -28,8 +27,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="227">
-              <caret line="42" column="18" lean-forward="true" selection-start-line="42" selection-start-column="18" selection-end-line="42" selection-end-column="32" />
+            <state relative-caret-position="332">
+              <caret line="196" column="4" selection-start-line="196" selection-start-column="4" selection-end-line="196" selection-end-column="4" />
               <folding>
                 <element signature="e#1#21#0" expanded="true" />
               </folding>
@@ -202,7 +201,7 @@
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49636364" visible="true" weight="0.066243835" />
-      <window_info id="Structure" order="1" sideWeight="0.50363636" side_tool="true" visible="true" weight="0.066243835" />
+      <window_info id="Structure" order="1" sideWeight="0.50363636" side_tool="true" weight="0.066243835" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -225,7 +224,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/BlackJack.py</url>
-          <line>195</line>
+          <line>298</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
@@ -293,8 +292,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="227">
-          <caret line="42" column="18" lean-forward="true" selection-start-line="42" selection-start-column="18" selection-end-line="42" selection-end-column="32" />
+        <state relative-caret-position="332">
+          <caret line="196" column="4" selection-start-line="196" selection-start-column="4" selection-end-line="196" selection-end-column="4" />
           <folding>
             <element signature="e#1#21#0" expanded="true" />
           </folding>
@@ -303,10 +302,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/BlackJack.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1833">
-          <caret line="299" selection-start-line="299" selection-end-line="299" />
+        <state relative-caret-position="338">
+          <caret line="445" lean-forward="true" selection-start-line="445" selection-end-line="445" />
           <folding>
-            <element signature="e#1900#1920#0" expanded="true" />
+            <element signature="e#1981#2001#0" expanded="true" />
           </folding>
         </state>
       </provider>

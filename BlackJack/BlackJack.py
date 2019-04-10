@@ -30,6 +30,7 @@
 # - TODO: Find a way to show progress when in multiprocessing mode
 # - TODO: Support more then 1 player.
 # - TODO: Implement some way of measuring the speed, like 2323 matches / sec
+# - DONE -- Implement a real behavior for the dealer. Follow bj rules for dealer
 
 
 import random as rnd
@@ -40,7 +41,7 @@ from time import sleep, time
 from bib_support import print_inline, ls, get_card_val
 import BlackJack_Alg as alg
 
-# Number of players playing the game against the dealer
+# Number of players playing the game against the dealer. Min 1, max > 1  :)
 ctNUM_PLAYERS = 1
 
 # Number of maches being simulated
@@ -55,6 +56,12 @@ ctUSE_BETTING = True
 # Dealer must hit on soft 17 (when have an ACE and a 6) ? If not, will hit when sum of cards <= 16, else hit on <= 17 if have an ACE or hit when <= 16 when doesnt have an ACE
 ctHIT_ON_SOFT_HAND = False
 
+
+# //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+# CLASS DEFINITION
+#
+# //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GamePlayer:
 
@@ -121,14 +128,16 @@ class GamePlayer:
 
         if _force is None:
 
+                # test if the selected alg is implemented
             if self.algoritm not in avaliable_algs:
                 raise ValueError("The selected algoritm is not implemented. Selected: " + self.algoritm + " | Avaliable: " + str(avaliable_algs))
 
-            if self.algoritm == "50X50":
-                ret = alg.blackjack_alg_50X50()
-
+            # check witch alg to use and use it
             if self.algoritm == "DEALER":
                 ret = alg.blackjack_alg_DEALER(self, ctHIT_ON_SOFT_HAND)
+
+            elif self.algoritm == "50X50":
+                ret = alg.blackjack_alg_50X50()
 
             elif self.algoritm == "BJ_BASIC_STRAT":
                 ret = alg.blackjack_alg_BJ_BASIC_STRAT(self)
@@ -139,16 +148,16 @@ class GamePlayer:
             elif self.algoritm == "SIMPLE":
                 ret = alg.blackjack_alg_SIMPLE(self)
 
-            elif self.algoritm == "NEVER":
+            # if has 21 or more, always say no to hit
+            if self.get_card_sum() >= 21:
+                ret = False
+
+             # had coded always and never, for tests. Last test so it prevales from any other test
+            if self.algoritm == "NEVER":
                 ret = False
 
             elif self.algoritm == "ALWAYS":
                 ret = True
-
-            # if has 21 or more, always say no to hit
-            if self.get_card_sum() >= 21:
-                if self.algoritm not in ["NEVER", "ALWAYS"]:
-                    ret = False
 
             return ret
 
@@ -158,34 +167,131 @@ class GamePlayer:
     def define_bet(self) -> float:
         return 10
 
-
-def get_card_from_deck(deck: list, forceValue: str = None) -> list:
-    if forceValue is None:
-        return deck.pop()
-    else:
-        return [forceValue, "♥"]
+# //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-def new_deck(shuffled: bool = True, number_of_decks_used: int = 1) -> list:
+def Main() -> None:
+    """
+    Main function
+    """
 
-    # _deck = [ ["A", "OUROS"], ["7", "ESPADAS"] ]
+    print("Simulating", ctNUM_MATCHES, "matches...")
 
-    values = [str(x) for x in range(2, 11)] + ["J", "Q", "K", "A"]
+    before_time = time()
 
-    # suits = ["OUROS", "ESPADAS", "COPAS", "PAUS"] # ♥♦♣♠
-    suits = ["♦", "♠", "♥", "♣"]  # ♥♦♣♠
+    run_simulation_project(ctNUM_MATCHES, ctPROCESSING_MODE, ctUSE_BETTING, ctNUM_PLAYERS)
 
-    deck_final = []
+    after_time = time()
 
-    for x in range(1, number_of_decks_used + 1):
-        deck = [[value, suit] for value in values for suit in suits]
+    print("Total time: ", after_time - before_time, "seconds")
 
-        deck_final = deck_final + deck
 
-    if shuffled == True:
-        rnd.shuffle(deck_final)
+def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL", use_betting: bool = False, num_players: int = 1) -> None:
 
-    return deck_final
+    max_num_tasks = 3  # 3 is the best after tests
+
+    win_ratio_final = []
+
+    win_ratio_task = []
+
+    if processing_mode == "NORMAL":
+        win_ratio_task = [simulate_matches([num_matches, processing_mode, use_betting, num_players])]
+
+        win_ratio_final = win_ratio_task[0]
+
+    elif processing_mode == "MULTIPROCESSING_PROC":
+        pass
+
+    elif processing_mode == "MULTIPROCESSING_POOL":
+
+        print_inline("Using multitaks. Calculating...")
+
+        num_matches_task = int(num_matches / max_num_tasks)
+        if num_matches_task == 0:
+            num_matches_task = 1
+
+        # print(num_matches_task)
+
+        pool = multiprocessing.Pool(processes=max_num_tasks)
+        win_ratio_task = pool.map(simulate_matches, [[num_matches_task, processing_mode, use_betting, num_players] for _ in range(0, max_num_tasks)])
+
+        win_ratio_final = tuple(sum(y) / len(y) for y in zip(*win_ratio_task))
+
+        print("")
+
+    elif processing_mode == "MULTITHREADING":
+        pass
+
+    print("Win Ratio in", ctNUM_MATCHES, "games (player x dealer x push): ", win_ratio_final)
+
+
+# def simulate_matches(num_matches: int = 1, processing_mode: str = "NORMAL") -> tuple:
+def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> tuple:
+
+    total_win_player = 0
+    total_win_dealer = 0
+    total_win_push = 0
+
+    number_of_decks = 6
+
+    # internal params. values from arguments
+    num_matches = params[0]
+    processing_mode = params[1]
+    use_betting = params[2]
+    num_players = params[3]
+
+    current_deck = new_deck(number_of_decks_used=number_of_decks)  # according to the rules, 8 decks are used
+
+    for x in range(0, num_matches):
+
+        # if there are less then 20 cards in deck, get new decks
+        if len(current_deck) <= 20:
+            current_deck = new_deck(number_of_decks_used=number_of_decks)
+
+        # print(current_deck)
+
+        # as the rules say, shuffle after every match
+        rnd.shuffle(current_deck)
+
+        winner = run_match(current_deck, use_betting)
+
+        if winner == "PLAYER":
+            total_win_player = total_win_player + 1
+
+        elif winner == "DEALER":
+            total_win_dealer = total_win_dealer + 1
+
+        elif winner == "PUSH":
+            total_win_push = total_win_push + 1
+
+        if x > 9:
+            win_ratio_player = (total_win_player * 100) / x
+            win_ratio_dealer = (total_win_dealer * 100) / x
+            win_ratio_push = (total_win_push * 100) / x
+
+            # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
+
+            line = "Real time: Win Ratio in " + "{:06d}".format(x + 1) + " games (player x dealer x push): " \
+                + "{:.8f}".format(win_ratio_player) + ", " \
+                + "{:.8f}".format(win_ratio_dealer) + ", " \
+                + "{:.8f}".format(win_ratio_push) \
+                + " -- Deck size: " + str(len(current_deck))
+
+            if processing_mode in ["NORMAL"]:
+                print_inline(line)
+
+    if num_matches > 10:
+        if processing_mode in ["NORMAL"]:
+            print("")
+
+    win_ratio_player = (total_win_player * 100) / num_matches
+    win_ratio_dealer = (total_win_dealer * 100) / num_matches
+    win_ratio_push = (total_win_push * 100) / num_matches
+
+    # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
+
+    return win_ratio_player, win_ratio_dealer, win_ratio_push
 
 
 def run_match(deck: list, use_betting: bool = False) -> str:
@@ -306,131 +412,39 @@ def run_match(deck: list, use_betting: bool = False) -> str:
     ls("=== FINAL ===========================================")
 
     ls("\n\n")
-    # print(player.should_hit())
-
-    # print(gPlayer1.cards)
-    #
-    # gPlayer1.add_card()
-    #
-    # print(gPlayer1.cards)
 
     return winner
 
 
-# def simulate_matches(num_matches: int = 1, processing_mode: str = "NORMAL") -> tuple:
-def simulate_matches(params: list = [1, "NORMAL", False]) -> tuple:
+def new_deck(shuffled: bool = True, number_of_decks_used: int = 1) -> list:
 
-    total_win_player = 0
-    total_win_dealer = 0
-    total_win_push = 0
+    # _deck = [ ["A", "OUROS"], ["7", "ESPADAS"] ]
 
-    number_of_decks = 6
+    values = [str(x) for x in range(2, 11)] + ["J", "Q", "K", "A"]
 
-    num_matches = params[0]
-    processing_mode = params[1]
-    use_betting = params[2]
+    # suits = ["OUROS", "ESPADAS", "COPAS", "PAUS"] # ♥♦♣♠
+    suits = ["♦", "♠", "♥", "♣"]  # ♥♦♣♠
 
-    current_deck = new_deck(number_of_decks_used=number_of_decks)  # according to the rules, 8 decks are used
+    deck_final = []
 
-    for x in range(0, num_matches):
+    for x in range(1, number_of_decks_used + 1):
+        deck = [[value, suit] for value in values for suit in suits]
 
-        # if there are less then 20 cards in deck, get new decks
-        if len(current_deck) <= 20:
-            current_deck = new_deck(number_of_decks_used=number_of_decks)
+        deck_final = deck_final + deck
 
-        # print(current_deck)
+    if shuffled == True:
+        rnd.shuffle(deck_final)
 
-        # as the rules say, shuffle after every match
-        rnd.shuffle(current_deck)
-
-        winner = run_match(current_deck, use_betting)
-
-        if winner == "PLAYER":
-            total_win_player = total_win_player + 1
-
-        elif winner == "DEALER":
-            total_win_dealer = total_win_dealer + 1
-
-        elif winner == "PUSH":
-            total_win_push = total_win_push + 1
-
-        if x > 9:
-            win_ratio_player = (total_win_player * 100) / x
-            win_ratio_dealer = (total_win_dealer * 100) / x
-            win_ratio_push = (total_win_push * 100) / x
-
-            # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
-
-            line = "Real time: Win Ratio in " + "{:06d}".format(x + 1) + " games (player x dealer x push): " \
-                + "{:.8f}".format(win_ratio_player) + ", " \
-                + "{:.8f}".format(win_ratio_dealer) + ", " \
-                + "{:.8f}".format(win_ratio_push) \
-                + " -- Deck size: " + str(len(current_deck))
-
-            if processing_mode in ["NORMAL"]:
-                print_inline(line)
-
-    if num_matches > 10:
-        if processing_mode in ["NORMAL"]:
-            print("")
-
-    win_ratio_player = (total_win_player * 100) / num_matches
-    win_ratio_dealer = (total_win_dealer * 100) / num_matches
-    win_ratio_push = (total_win_push * 100) / num_matches
-
-    # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
-
-    return win_ratio_player, win_ratio_dealer, win_ratio_push
+    return deck_final
 
 
-def Main() -> None:
-    """
-    Main function
-    """
-
-    max_num_tasks = 3  # 3 is the best after tests
-
-    win_ratio_final = []
-
-    win_ratio_task = []
-
-    print("Simulating", ctNUM_MATCHES, "matches...")
-
-    before_time = time()
-
-    if ctPROCESSING_MODE == "NORMAL":
-        win_ratio_task = [simulate_matches([ctNUM_MATCHES, ctPROCESSING_MODE, ctUSE_BETTING])]
-
-        win_ratio_final = win_ratio_task[0]
-
-    elif ctPROCESSING_MODE == "MULTIPROCESSING_PROC":
-        pass
-
-    elif ctPROCESSING_MODE == "MULTIPROCESSING_POOL":
-
-        print_inline("Using multitaks. Calculating...")
-
-        num_matches_task = int(ctNUM_MATCHES / max_num_tasks)
-        if num_matches_task == 0:
-            num_matches_task = 1
-
-        # print(num_matches_task)
-
-        pool = multiprocessing.Pool(processes=max_num_tasks)
-        win_ratio_task = pool.map(simulate_matches, [[num_matches_task, ctPROCESSING_MODE, ctUSE_BETTING] for _ in range(0, max_num_tasks)])
-
-        win_ratio_final = tuple(sum(y) / len(y) for y in zip(*win_ratio_task))
-
-        print("")
-
-    elif ctPROCESSING_MODE == "MULTITHREADING":
-        pass
-
-    after_time = time()
-
-    print("Win Ratio in", ctNUM_MATCHES, "games (player x dealer x push): ", win_ratio_final)
-    print("Total time: ", after_time - before_time, "seconds")
+def get_card_from_deck(deck: list, forceValue: str = None) -> list:
+    if forceValue is None:
+        return deck.pop()
+    else:
+        return [forceValue, "♥"]
 
 
 if __name__ == "__main__":
+
     Main()
