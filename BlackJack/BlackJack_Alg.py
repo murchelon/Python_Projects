@@ -3,8 +3,35 @@ import random as rnd
 
 from bib_support import get_card_val
 
+# Default algoritm for the dealer. Follows the rules of the game for the dealer
+def blackjack_alg_DEALER(caller: object, hit_on_soft_hand: bool = False) -> bool:
+
+    ret = None
+
+    num_of_aces = len([x[0] for x in caller.cards if x[0] == "A"])
+
+    card_sum = caller.get_card_sum()
+
+    if card_sum <= 16:
+        ret = True
+
+    elif card_sum == 17:
+        if hit_on_soft_hand is False:
+            ret = False
+        else:
+            if num_of_aces >= 1:
+                ret = True
+            else:
+                ret = False
+    else:
+        ret = False
+
+    return ret
+
 
 def blackjack_alg_50X50() -> bool:
+
+    ret = None
 
     if rnd.randint(0, 1) == 0:
         ret = False
@@ -14,7 +41,7 @@ def blackjack_alg_50X50() -> bool:
     return ret
 
 
-def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
+def blackjack_alg_BJ_BASIC_STRAT(caller: object) -> bool:
 
     # https://en.wikipedia.org/wiki/Blackjack#Basic_strategy
 
@@ -22,7 +49,17 @@ def blackjack_alg_WIKIPEDIA_BLACKJACK(caller: object) -> bool:
 
     card_sum = caller.get_card_sum()
 
-    known_dealer_card_value = get_card_val(caller.known_dealer_cards[0])
+    # we should never use this alg for the dealer beause the alg
+    # depends on the dealer first card.. witch doesnt exists when
+    # the dealer is being created. But, for testing, I will hard code
+    # some random card for is this alg is being used by the dealer.
+    # this random card probably fucks all the reality im trying to achieve
+    # not random. fixed some card
+    # The dealer has it own algoritm.
+    if caller.type == "DEALER":
+        known_dealer_card_value = get_card_val("7")
+    else:
+        known_dealer_card_value = get_card_val(caller.known_dealer_cards[0])
 
     ret = None
 
@@ -147,7 +184,17 @@ def blackjack_alg_MURCH(caller: object) -> bool:
 
     card_sum = caller.get_card_sum()
 
-    known_dealer_card_value = get_card_val(caller.known_dealer_cards[0])
+    # we should never use this alg for the dealer beause the alg
+    # depends on the dealer first card.. witch doesnt exists when
+    # the dealer is being created. But, for testing, I will hard code
+    # some random card for is this alg is being used by the dealer.
+    # this random card probably fucks all the reality im trying to achieve
+    # not random. fixed some card
+    # The dealer has it own algoritm.
+    if caller.type == "DEALER":
+        known_dealer_card_value = get_card_val("7")
+    else:
+        known_dealer_card_value = get_card_val(caller.known_dealer_cards[0])
 
     ret = None
 
@@ -168,7 +215,7 @@ def blackjack_alg_MURCH(caller: object) -> bool:
     return ret
 
 
-def blackjack_alg_SIMPLE() -> bool:
+def blackjack_alg_SIMPLE(caller: object) -> bool:
 
     # from my guts2
 

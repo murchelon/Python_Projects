@@ -19,7 +19,7 @@
 # - TODO: make this program be able to play against flash sites with bj games
 # - TODO: Implement spliting of cards
 # - TODO: Implement betting
-# - DONE -- Implement push(tie, when neither the player or dealer wins. Today when there is a tie, the dealer wins)
+# - DONE -- Implement push (tie, when neither the player or dealer wins. Today when there is a tie, the dealer wins)
 # - TODO: Implement algorigm of Machine Learning (this is the main original goal)
 # - TODO: Implement algoritm of Card Counting (Hi-Lo ? Must me able to do 2 types of CC: One like the real world and other with simulated real decks "in mind")
 # - TODO: Implement Multithreading to compare performance. Probably worse
@@ -38,16 +38,32 @@ import multiprocessing
 from time import sleep, time
 
 from bib_support import print_inline, ls, get_card_val
-from BlackJack_Alg import blackjack_alg_50X50, blackjack_alg_WIKIPEDIA_BLACKJACK, blackjack_alg_MURCH, blackjack_alg_SIMPLE
+import BlackJack_Alg as alg
+
+# Number of players playing the game against the dealer
+ctNUM_PLAYERS = 1
+
+# Number of maches being simulated
+ctNUM_MATCHES = 10000
+
+# Type of processing the matches. Use: # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
+ctPROCESSING_MODE = "NORMAL"
+
+# Use betting system. Place bets and try to maximize money. Balance shows in the results
+ctUSE_BETTING = True
+
+# Dealer must hit on soft 17 (when have an ACE and a 6) ? If not, will hit when sum of cards <= 16, else hit on <= 17 if have an ACE or hit when <= 16 when doesnt have an ACE
+ctHIT_ON_SOFT_HAND = False
 
 
 class GamePlayer:
 
-    def __init__(self, _name: str, _type: str = "PLAYER", _algoritm: str = "50X50", _cards: list = [], _known_dealer_cards: list = [], _start_money: float = 1000.0):
+    def __init__(self, _ID: int, _name: str, _type: str = "PLAYER", _algoritm: str = "50X50", _cards: list = [], _known_dealer_cards: list = [], _start_money: float = 1000.0):
+        self.ID = _ID
         self.name = _name
         self.type = _type
         self.cards = _cards
-        self.algoritm = _algoritm
+        self.algoritm = _algoritm.upper()
         self.known_dealer_cards = _known_dealer_cards
         self.start_money = _start_money
         self.final_money = _start_money
@@ -101,34 +117,33 @@ class GamePlayer:
 
         ret = False
 
+        avaliable_algs = ["NEVER", "ALWAYS", "50X50", "BJ_BASIC_STRAT", "MURCH", "DEALER"]
+
         if _force is None:
 
-            if self.algoritm not in ["NEVER", "ALWAYS", "50X50", "WIKIPEDIA_BLACKJACK", "MURCH"]:
-                self.algoritm = "50X50"
+            if self.algoritm not in avaliable_algs:
+                raise ValueError("The selected algoritm is not implemented. Selected: " + self.algoritm + " | Avaliable: " + str(avaliable_algs))
 
             if self.algoritm == "50X50":
-                ret = blackjack_alg_50X50()
+                ret = alg.blackjack_alg_50X50()
 
-            elif self.algoritm == "WIKIPEDIA_BLACKJACK":
-                ret = blackjack_alg_WIKIPEDIA_BLACKJACK(self)
+            if self.algoritm == "DEALER":
+                ret = alg.blackjack_alg_DEALER(self, ctHIT_ON_SOFT_HAND)
+
+            elif self.algoritm == "BJ_BASIC_STRAT":
+                ret = alg.blackjack_alg_BJ_BASIC_STRAT(self)
 
             elif self.algoritm == "MURCH":
-                ret = blackjack_alg_MURCH(self)
+                ret = alg.blackjack_alg_MURCH(self)
 
             elif self.algoritm == "SIMPLE":
-                ret = blackjack_alg_SIMPLE()
+                ret = alg.blackjack_alg_SIMPLE(self)
 
             elif self.algoritm == "NEVER":
                 ret = False
 
             elif self.algoritm == "ALWAYS":
                 ret = True
-
-            # if its the dealer, the rules says it must hit if has 16 or less
-            if self.type == "DEALER":
-                if self.algoritm not in ["NEVER", "ALWAYS"]:
-                    if self.get_card_sum() <= 16:
-                        ret = True
 
             # if has 21 or more, always say no to hit
             if self.get_card_sum() >= 21:
@@ -178,8 +193,8 @@ def run_match(deck: list, use_betting: bool = False) -> str:
     winner = ""
 
     #  create player and dealer
-    player = GamePlayer(_name="Murch", _algoritm="WIKIPEDIA_BLACKJACK", _cards=[])
-    dealer = GamePlayer(_name="Blacu Jacku", _type="DEALER", _cards=[])
+    dealer = GamePlayer(0, _name="Blacu Jacku Dueler", _algoritm="DEALER", _type="DEALER", _cards=[])
+    player = GamePlayer(1, _name="Murch", _algoritm="BJ_BASIC_STRAT", _cards=[])
 
     # if we are using bets, then, place bet
     if use_betting is True:
@@ -373,53 +388,47 @@ def Main() -> None:
     Main function
     """
 
-    num_matches = 1000
-
-    processing_mode = "NORMAL"     # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
-
     max_num_tasks = 3  # 3 is the best after tests
-
-    use_betting = True
 
     win_ratio_final = []
 
     win_ratio_task = []
 
-    print("Simulating", num_matches, "matches...")
+    print("Simulating", ctNUM_MATCHES, "matches...")
 
     before_time = time()
 
-    if processing_mode == "NORMAL":
-        win_ratio_task = [simulate_matches([num_matches, processing_mode, use_betting])]
+    if ctPROCESSING_MODE == "NORMAL":
+        win_ratio_task = [simulate_matches([ctNUM_MATCHES, ctPROCESSING_MODE, ctUSE_BETTING])]
 
         win_ratio_final = win_ratio_task[0]
 
-    elif processing_mode == "MULTIPROCESSING_PROC":
+    elif ctPROCESSING_MODE == "MULTIPROCESSING_PROC":
         pass
 
-    elif processing_mode == "MULTIPROCESSING_POOL":
+    elif ctPROCESSING_MODE == "MULTIPROCESSING_POOL":
 
         print_inline("Using multitaks. Calculating...")
 
-        num_matches_task = int(num_matches / max_num_tasks)
+        num_matches_task = int(ctNUM_MATCHES / max_num_tasks)
         if num_matches_task == 0:
             num_matches_task = 1
 
         # print(num_matches_task)
 
         pool = multiprocessing.Pool(processes=max_num_tasks)
-        win_ratio_task = pool.map(simulate_matches, [[num_matches_task, processing_mode] for _ in range(0, max_num_tasks)])
+        win_ratio_task = pool.map(simulate_matches, [[num_matches_task, ctPROCESSING_MODE, ctUSE_BETTING] for _ in range(0, max_num_tasks)])
 
         win_ratio_final = tuple(sum(y) / len(y) for y in zip(*win_ratio_task))
 
         print("")
 
-    elif processing_mode == "MULTITHREADING":
+    elif ctPROCESSING_MODE == "MULTITHREADING":
         pass
 
     after_time = time()
 
-    print("Win Ratio in", num_matches, "games (player x dealer x push): ", win_ratio_final)
+    print("Win Ratio in", ctNUM_MATCHES, "games (player x dealer x push): ", win_ratio_final)
     print("Total time: ", after_time - before_time, "seconds")
 
 
