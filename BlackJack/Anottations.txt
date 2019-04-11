@@ -1,0 +1,21 @@
+
+
+LINK PARA LEITURA:
+==================
+
+https://www.analyticsvidhya.com/blog/2017/04/flawless-winning-strategy-casino-blackjack-data-science/
+https://boardgames.stackexchange.com/questions/44633/how-do-blackjack-simulations-work
+
+
+
+Itens sublime para instalar:
+
+predawn theme
+material theme
+
+brackethighlighter
+sidebar enchantemens
+anaconda
+
+
+https://github.com/CoreyMSchafer/dotfiles/blob/master/settings/Anaconda.sublime-settings
