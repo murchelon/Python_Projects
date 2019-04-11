@@ -28,8 +28,8 @@
 # - TODO: Implement game against a human (1 and 2 players ?)
 # - TODO: Create a GUI ?
 # - TODO: Find a way to show progress when in multiprocessing mode
-# - TODO: Support more then 1 player.
-# - TODO: Implement some way of measuring the speed, like 2323 matches / sec
+# - DONE -- Support more then 1 player (computer dealer x computer x computer...)
+# - DONE -- Implement some way of measuring the speed, like 2323 matches / sec
 # - DONE -- Implement a real behavior for the dealer. Follow bj rules for dealer
 
 
@@ -49,7 +49,7 @@ import BlackJack_Alg as alg
 
 
 # Number of players playing the game against the dealer. Min 1, max > 1  :)
-ctNUM_PLAYERS = 1
+ctNUM_PLAYERS = 3
 
 # Number of maches being simulated
 ctNUM_MATCHES = 10000
@@ -62,6 +62,9 @@ ctUSE_BETTING = True
 
 # Dealer must hit on soft 17 (when have an ACE and a 6) ? If not, will hit when sum of cards <= 16, else hit on <= 17 if have an ACE or hit when <= 16 when doesnt have an ACE
 ctHIT_ON_SOFT_HAND = False
+
+# Number of complete decks of cards in play. When there are only 20% of cards in the combined decks, the dealer get a new set of decks and shuffle them
+ctNUM_OF_DECKS = 6
 
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,15 +183,20 @@ class GamePlayer:
 
 def Main() -> None:
 
-    print("Simulating", ctNUM_MATCHES, "matches...")
+    print("Simulating", ctNUM_MATCHES, "matches ... ")
+
 
     before_time = time()
+    speed = 0
 
     run_simulation_project(ctNUM_MATCHES, ctPROCESSING_MODE, ctUSE_BETTING, ctNUM_PLAYERS)
 
-    after_time = time()
+    passed_time = time() - before_time
 
-    print("Total time: ", after_time - before_time, "seconds")
+    if passed_time > 0 :
+        speed = ctNUM_MATCHES / passed_time
+
+    print("Total time: ", round(passed_time, 2), "seconds -- " + str(round(speed, 2)) + " matches/s")
 
 
 def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL", use_betting: bool = False, num_players: int = 1) -> None:
@@ -233,16 +241,20 @@ def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL"
     print("Win Ratio in", ctNUM_MATCHES, "games (player x dealer x push): ", win_ratio_final)
 
 
-def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> tuple:
+def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
     """
     runs the entire desired number of matches
     """
 
-    total_win_player = 0
-    total_win_dealer = 0
-    total_win_push = 0
+    global ctNUM_OF_DECKS
 
-    number_of_decks = 6
+
+    aGamePlayers = []
+
+
+
+    speed = 0
+
 
     # internal params. values from arguments
     num_matches = params[0]
@@ -250,42 +262,75 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> tuple:
     use_betting = params[2]
     num_players = params[3]
 
-    current_deck = new_deck(number_of_decks_used=number_of_decks)  # according to the rules, 8 decks are used
+
+    total_win_player = [0 for _ in range(0, num_players)]
+    total_win_dealer = [0 for _ in range(0, num_players)]
+    total_win_push = [0 for _ in range(0, num_players)]
+
+
+    # if the number of players (plus dealer) times 6 cards each is more then the avaliable cards, incrise deck number to support the game
+    if (num_players + 1) * 6 >= ctNUM_OF_DECKS * 54:
+        ctNUM_OF_DECKS = int((num_players + 1) * 6) + 1
+        print ("To many players. Increasing deck numeber to " + str(ctNUM_OF_DECKS))
+        
+    current_deck = new_deck(number_of_decks_used=ctNUM_OF_DECKS)  
+
+
+
+    # dealer = GamePlayer(0, _name="Blacu Jacku Dueler", _algoritm="DEALER", _type="DEALER", _cards=[])
+    # player = GamePlayer(1, _name="Murch", _algoritm="BJ_BASIC_STRAT", _cards=[])
+
+    # add dealer
+    aGamePlayers.append(GamePlayer(0, _name="Blacu Jacku Dueler", _algoritm="DEALER", _type="DEALER", _cards=[]))
+
+    for conta_player in range(1, num_players + 1):
+        aGamePlayers.append(GamePlayer(conta_player, _name="Player " + str(conta_player), _algoritm="BJ_BASIC_STRAT", _cards=[]))
+
+
+
+    before_time = time()
+
+    print(str(num_players) + " player(s), 1 Dealer, " + str(ctNUM_OF_DECKS) + " decks")
 
     for x in range(0, num_matches):
 
         # if there are less then 20 cards in deck, get new decks
-        if len(current_deck) <= 20:
-            current_deck = new_deck(number_of_decks_used=number_of_decks)
+        if len(current_deck) <= int(ctNUM_OF_DECKS * 52 * 0.2):
+            current_deck = new_deck(number_of_decks_used=ctNUM_OF_DECKS)
 
         # print(current_deck)
 
-        # as the rules say, shuffle after every match
-        rnd.shuffle(current_deck)
 
-        winner = run_match(current_deck, use_betting)
+        winner = run_match(current_deck, aGamePlayers, use_betting)
 
-        if winner == "PLAYER":
-            total_win_player = total_win_player + 1
+        for conta_player in range(0, len(winner)):
 
-        elif winner == "DEALER":
-            total_win_dealer = total_win_dealer + 1
+            if winner[conta_player] == "PLAYER":
+                total_win_player[conta_player] = total_win_player[conta_player] + 1
 
-        elif winner == "PUSH":
-            total_win_push = total_win_push + 1
+            elif winner[conta_player] == "DEALER":
+                total_win_dealer[conta_player] = total_win_dealer[conta_player] + 1
+
+            elif winner[conta_player] == "PUSH":
+                total_win_push[conta_player] = total_win_push[conta_player] + 1
+
 
         if x > 9:
-            win_ratio_player = (total_win_player * 100) / x
-            win_ratio_dealer = (total_win_dealer * 100) / x
-            win_ratio_push = (total_win_push * 100) / x
+            win_ratio_player = (total_win_player[0] * 100) / x
+            win_ratio_dealer = (total_win_dealer[0] * 100) / x
+            win_ratio_push = (total_win_push[0] * 100) / x
 
+            passed_time = time() - before_time
+
+            if passed_time > 0:
+                speed = x / (passed_time)
             # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
 
-            line = "Real time: Win Ratio in " + "{:06d}".format(x + 1) + " games (player x dealer x push): " \
+            line = "Player 1:  Win Ratio in " + "{:06d}".format(x + 1) + " games (player x dealer x push): " \
                 + "{:.8f}".format(win_ratio_player) + ", " \
                 + "{:.8f}".format(win_ratio_dealer) + ", " \
                 + "{:.8f}".format(win_ratio_push) \
-                + " -- Deck size: " + str(len(current_deck))
+                + " -- Speed: {:.2f}".format(speed) + " matches/s"
 
             if processing_mode in ["NORMAL"]:
                 print_inline(line)
@@ -294,128 +339,272 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> tuple:
         if processing_mode in ["NORMAL"]:
             print("")
 
-    win_ratio_player = (total_win_player * 100) / num_matches
-    win_ratio_dealer = (total_win_dealer * 100) / num_matches
-    win_ratio_push = (total_win_push * 100) / num_matches
+    final_result = []
+
+    for conta_player in range(0, num_players):
+
+        win_ratio_player = (total_win_player[conta_player] * 100) / num_matches
+        win_ratio_dealer = (total_win_dealer[conta_player] * 100) / num_matches
+        win_ratio_push = (total_win_push[conta_player] * 100) / num_matches
+
+        final_result.append((win_ratio_player, win_ratio_dealer, win_ratio_push))
+
+
 
     # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
 
-    return win_ratio_player, win_ratio_dealer, win_ratio_push
+    return final_result
 
 
-def run_match(deck: list, use_betting: bool = False) -> str:
+def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> list:
     """
     runs one match between a dealer and players, using the deck in place at the moment
+    returns a list with the result in N positions, 1 for each player, in order (player1, player2, etc)
+    Ex.: 3 players. REsult: ["PLAYER", "PLAYER", "DEALER"] . In this result the player 1 and 2 won.. while the 
+    player 3 lost.
     """
 
-    winner = ""
+    winner = []
+    ret_result = []
+
 
     #  create player and dealer
-    dealer = GamePlayer(0, _name="Blacu Jacku Dueler", _algoritm="DEALER", _type="DEALER", _cards=[])
-    player = GamePlayer(1, _name="Murch", _algoritm="BJ_BASIC_STRAT", _cards=[])
+    # dealer = GamePlayer(0, _name="Blacu Jacku Dueler", _algoritm="DEALER", _type="DEALER", _cards=[])
+    # player = GamePlayer(1, _name="Murch", _algoritm="BJ_BASIC_STRAT", _cards=[])
+
+    # clean the hand and betting for the next match
+    for player in arrGamePlayers:
+        player.known_dealer_cards = []
+        player.cards = []
+
+        if use_betting is True:
+            player.actual_bet = 0
+
 
     # if we are using bets, then, place bet
     if use_betting is True:
-        player.actual_bet = player.define_bet()
+        # player.actual_bet = player.define_bet()
+        for player in arrGamePlayers:
+            if player.type != "DEALER":
+                player.actual_bet = player.define_bet()
+
+
+
 
     # Players get 1 card
-    player.hit(deck)
+    # player.hit(deck)
+    for player in arrGamePlayers:
+        if player.type != "DEALER":
+            player.hit(deck)
 
     # Dealer get 1 card face up
-    dealer.hit(deck)
+    # dealer.hit(deck)
+    for dealer in arrGamePlayers:
+        if dealer.type == "DEALER":
+            dealer.hit(deck)
+
+
 
     # dealer reveals their first card to players
-    player.known_dealer_cards = dealer.cards[0]
+    # player.known_dealer_cards = dealer.cards[0]
+    for player in arrGamePlayers:
+        if player.type != "DEALER":
+            player.known_dealer_cards = arrGamePlayers[0].cards[0]
 
     # Players get 1 more card
-    player.hit(deck)
+    # player.hit(deck)
+    for player in arrGamePlayers:
+        if player.type != "DEALER":
+            player.hit(deck)
 
     # Dealer get 1 more card face down
-    dealer.hit(deck)
+    # dealer.hit(deck)
+    for dealer in arrGamePlayers:
+        if dealer.type == "DEALER":
+            dealer.hit(deck)
+
+
 
     # player = GamePlayer(_name="Murch", _algoritm = "MURCH", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name="Murch", _algoritm = "SIMPLE", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck, "K"), get_card_from_deck(deck, "8") ])
 
-    ls("=== MATCH ===========================================")
-    ls("Player INIT hand:", player.print_hand(), player.get_card_sum())
-    ls("dealer  INIT hand:", dealer.print_hand(), dealer.get_card_sum())
 
-    ls("-----------------------------------------------------")
+    turn = "PLAYERS"
 
-    turn = "PLAYER"
 
-    while turn == "PLAYER":
 
-        check_hit = player.should_hit()
+    while turn == "PLAYERS":
 
-        if check_hit is True:
-            player.hit(deck)
+        for player in list(arrGamePlayers):
+            if player.type != "DEALER":
 
-        ls("PLAYER: check_hit =", check_hit, "| Cartas: ", player.print_hand(), player.get_card_sum())
+                player_done = False
 
-        if player.get_card_sum() > 21:
-            turn = "END"
-            winner = "DEALER"
+                while player_done is False:
 
-            if use_betting is True:
-                dealer.final_money = dealer.final_money + player.actual_bet
-                player.final_money = player.final_money - player.actual_bet
-                player.actual_bet = 0
+                    check_hit = player.should_hit()
 
-            ls("player exploded!")
 
-        else:
-            if check_hit is False:
-                turn = "DEALER"
+                    if check_hit is True:
+
+                        player.hit(deck)
+
+                    else:
+                        player_done = True
+
+
+                    if player.get_card_sum() > 21:
+
+                        winner.append("DEALER")
+
+                        player_done = True
+
+                        # if use_betting is True:
+                        #     dealer.final_money = dealer.final_money + player.actual_bet
+                        #     player.final_money = player.final_money - player.actual_bet
+                        #     player.actual_bet = 0
+
+
+                    else:
+                        if player_done == True:
+                            winner.append("STAND")
+
+        # for player in list(arrGamePlayers):
+        #     if player.type != "DEALER":
+        #
+        #         player_done = False
+        #
+        #         while player_done is False:
+        #
+        #             # check_hit = player.should_hit()
+        #             check_hit = False
+        #
+        #             if check_hit is True:
+        #
+        #                 player.hit(deck)
+        #
+        #             else:
+        #                 player_done = True
+        #
+        #             if player.get_card_sum() > 21:
+        #
+        #                 winner.append("DEALER")
+        #
+        #                 player_done = True
+        #
+        #                 # if use_betting is True:
+        #                 #     dealer.final_money = dealer.final_money + player.actual_bet
+        #                 #     player.final_money = player.final_money - player.actual_bet
+        #                 #     player.actual_bet = 0
+        #
+        #
+        #             else:
+        #                 if player_done == True:
+        #                     winner.append("STAND")
+
+
+
+        turn = "DEALER"
+
+
 
     while turn == "DEALER":
 
-        check_hit = dealer.should_hit()
+        for dealer in arrGamePlayers:
+            if dealer.type == "DEALER":
 
-        if check_hit is True:
-            dealer.hit(deck)
+                dealer_done = False
 
-        ls("DEALER: check_hit =", check_hit, "| Cartas: ", dealer.print_hand(), dealer.get_card_sum())
+                while dealer_done is False:
 
-        if dealer.get_card_sum() > 21:
-            turn = "END"
-            winner = "PLAYER"
+                    check_hit = dealer.should_hit()
 
-            if use_betting is True:
-                dealer.final_money = dealer.final_money - player.actual_bet
-                player.final_money = player.final_money + player.actual_bet
-                player.actual_bet = 0
+                    if check_hit is True:
+                        dealer.hit(deck)
+                    else:
+                        dealer_done = True
 
-            ls("dealer exploded!")
 
-        else:
-            if check_hit is False:
-                turn = "END"
 
-        # ls("-----------------------------------------------------")
+                    if dealer.get_card_sum() > 21:
 
-    if winner == "":
-        if dealer.get_card_sum() == player.get_card_sum():
-            winner = "PUSH"
-            player.actual_bet = 0
+                        # insert the result of the dealer in the 1st position of the result list
+                        winner.insert(0, "BLOW")
 
-        elif dealer.get_card_sum() > player.get_card_sum():
-            winner = "DEALER"
+                        dealer_done = True
 
-            if use_betting is True:
-                dealer.final_money = dealer.final_money + player.actual_bet
-                player.final_money = player.final_money - player.actual_bet
-                player.actual_bet = 0
+                        # if use_betting is True:
+                        #     dealer.final_money = dealer.final_money + player.actual_bet
+                        #     player.final_money = player.final_money - player.actual_bet
+                        #     player.actual_bet = 0
 
-        elif dealer.get_card_sum() < player.get_card_sum():
-            winner = "PLAYER"
+                        ls(dealer.name, "exploded!")
 
-            if use_betting is True:
-                dealer.final_money = dealer.final_money - player.actual_bet
-                player.final_money = player.final_money + player.actual_bet
-                player.actual_bet = 0
+                    else:
+                        if dealer_done == True:
+                            # insert the result of the dealer in the 1st position of the result list
+                            winner.insert(0, "STAND")
+
+
+                    ls(dealer.name, ": check_hit =", check_hit, "| Cartas: ", dealer.print_hand(), dealer.get_card_sum())
+
+        turn = "END"
+
+
+
+
+    dealer_sum = 0
+    player_sum = 0
+
+
+    # check if dealer exploded. All players that are not exploded wins
+    if winner[0] == "BLOW":
+
+        for x in range(0, len(winner)):
+            if x > 0:
+                if winner[x] == "STAND":
+                    winner[x] = "PLAYER"
+
+    else:
+
+        for x in range(0, len(winner)):
+
+            if x == 0:
+
+                dealer_sum = arrGamePlayers[x].get_card_sum()
+
+            else:
+
+                player_sum = arrGamePlayers[x].get_card_sum()
+
+
+            if x > 0:
+
+                if winner[x] == "STAND":
+
+                    if dealer_sum == player_sum:
+                        winner[x] = "PUSH"
+
+                    elif dealer_sum > player_sum:
+                        winner[x] = "DEALER"
+
+                        # if use_betting is True:
+                        #     dealer.final_money = dealer.final_money + player.actual_bet
+                        #     player.final_money = player.final_money - player.actual_bet
+                        #     player.actual_bet = 0
+
+
+                    elif dealer_sum < player_sum:
+                        winner[x] = "PLAYER"
+
+                        # if use_betting is True:
+                        #     dealer.final_money = dealer.final_money - player.actual_bet
+                        #     player.final_money = player.final_money + player.actual_bet
+                        #     player.actual_bet = 0
+
+
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
     ls("dealer  FINAL hand:", dealer.print_hand(), dealer.get_card_sum())
@@ -425,7 +614,7 @@ def run_match(deck: list, use_betting: bool = False) -> str:
 
     ls("\n\n")
 
-    return winner
+    return winner[1:]
 
 
 def new_deck(shuffled: bool = True, number_of_decks_used: int = 1) -> list:
