@@ -24,13 +24,15 @@
 # - TODO: Implement algoritm of Card Counting (Hi-Lo ? Must me able to do 2 types of CC: One like the real world and other with simulated real decks "in mind")
 # - TODO: Implement Multithreading to compare performance. Probably worse
 # - TODO: Implement Multiprocessing by NOT using a Pool .. to compare performance
-# - TODO: export lots os data and shit to use with Jupyter and Plot and Numby and etc
+# - TODO: export lots os data and shit to use with Jupyter and Plot and Numpy and etc
 # - TODO: Implement game against a human (1 and 2 players ?)
 # - TODO: Create a GUI ?
 # - TODO: Find a way to show progress when in multiprocessing mode
 # - DONE -- Support more then 1 player (computer dealer x computer x computer...)
 # - DONE -- Implement some way of measuring the speed, like 2323 matches / sec
 # - DONE -- Implement a real behavior for the dealer. Follow bj rules for dealer
+# - TODO: Change several aspects of the program to make it faster. like using sets and many other little changes
+# - TODO: Stop using lists ! use NumPY for everything! Performance!
 
 
 import random as rnd
@@ -49,13 +51,13 @@ import BlackJack_Alg as alg
 
 
 # Number of players playing the game against the dealer. Min 1, max > 1  :)
-ctNUM_PLAYERS = 3
+ctNUM_PLAYERS = 1
 
 # Number of maches being simulated
-ctNUM_MATCHES = 10000
+ctNUM_MATCHES = 100000
 
 # Type of processing the matches. Use: # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
-ctPROCESSING_MODE = "NORMAL"
+ctPROCESSING_MODE = "MULTIPROCESSING_POOL"
 
 # Use betting system. Place bets and try to maximize money. Balance shows in the results
 ctUSE_BETTING = True
@@ -65,6 +67,12 @@ ctHIT_ON_SOFT_HAND = False
 
 # Number of complete decks of cards in play. When there are only 20% of cards in the combined decks, the dealer get a new set of decks and shuffle them
 ctNUM_OF_DECKS = 6
+
+# Number os simultaneous processes or threads when using multitasks. Paralelism. Speeds up the simulation
+ctNUM_SIMULTANEOUS_TASKS = 2
+
+# Precision of the numbers, when returning the statistics. Its rounded to the number of decimals defined here
+ctNUM_PRECISION = 8
 
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +193,6 @@ def Main() -> None:
 
     print("Simulating", ctNUM_MATCHES, "matches ... ")
 
-
     before_time = time()
     speed = 0
 
@@ -193,7 +200,7 @@ def Main() -> None:
 
     passed_time = time() - before_time
 
-    if passed_time > 0 :
+    if passed_time > 0:
         speed = ctNUM_MATCHES / passed_time
 
     print("Total time: ", round(passed_time, 2), "seconds -- " + str(round(speed, 2)) + " matches/s")
@@ -204,9 +211,9 @@ def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL"
     Main function to be called. Runs the entire simulation with the desired parameters
     """
 
-    max_num_tasks = 3  # 3 is the best after tests
-
     win_ratio_final = []
+
+    win_ratio_helper = []
 
     win_ratio_task = []
 
@@ -222,16 +229,29 @@ def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL"
 
         print_inline("Using multitaks. Calculating...")
 
-        num_matches_task = int(num_matches / max_num_tasks)
+        print("")
+
+        num_matches_task = int(num_matches / (ctNUM_SIMULTANEOUS_TASKS + 1))
         if num_matches_task == 0:
             num_matches_task = 1
 
         # print(num_matches_task)
 
-        pool = multiprocessing.Pool(processes=max_num_tasks)
-        win_ratio_task = pool.map(simulate_matches, [[num_matches_task, processing_mode, use_betting, num_players] for _ in range(0, max_num_tasks)])
+        pool = multiprocessing.Pool(processes=ctNUM_SIMULTANEOUS_TASKS)
+        win_ratio_simu = pool.map(simulate_matches, [[num_matches_task, processing_mode, use_betting, num_players] for _ in range(0, ctNUM_SIMULTANEOUS_TASKS)])
 
-        win_ratio_final = tuple(sum(y) / len(y) for y in zip(*win_ratio_task))
+        # print("win_ratio_simu = " + str(win_ratio_simu))
+
+        for proc_num in win_ratio_simu:
+
+            win_ratio_helper.append(tuple(round(sum(y) / len(y), ctNUM_PRECISION) for y in zip(*proc_num)))
+
+            # print("proc_num1 = " + str(proc_num))
+            # print("win_ratio_helper = " + str(win_ratio_helper))
+
+        win_ratio_final = tuple(round(sum(y) / len(y), ctNUM_PRECISION) for y in zip(*win_ratio_helper))
+
+        # print("final = " + str(win_ratio_final))
 
         print("")
 
@@ -248,13 +268,9 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
 
     global ctNUM_OF_DECKS
 
-
     aGamePlayers = []
 
-
-
     speed = 0
-
 
     # internal params. values from arguments
     num_matches = params[0]
@@ -262,20 +278,16 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
     use_betting = params[2]
     num_players = params[3]
 
-
     total_win_player = [0 for _ in range(0, num_players)]
     total_win_dealer = [0 for _ in range(0, num_players)]
     total_win_push = [0 for _ in range(0, num_players)]
 
-
     # if the number of players (plus dealer) times 6 cards each is more then the avaliable cards, incrise deck number to support the game
     if (num_players + 1) * 6 >= ctNUM_OF_DECKS * 54:
         ctNUM_OF_DECKS = int((num_players + 1) * 6) + 1
-        print ("To many players. Increasing deck numeber to " + str(ctNUM_OF_DECKS))
-        
-    current_deck = new_deck(number_of_decks_used=ctNUM_OF_DECKS)  
+        print("To many players. Increasing deck numeber to " + str(ctNUM_OF_DECKS))
 
-
+    current_deck = new_deck(number_of_decks_used=ctNUM_OF_DECKS)
 
     # dealer = GamePlayer(0, _name="Blacu Jacku Dueler", _algoritm="DEALER", _type="DEALER", _cards=[])
     # player = GamePlayer(1, _name="Murch", _algoritm="BJ_BASIC_STRAT", _cards=[])
@@ -285,8 +297,6 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
 
     for conta_player in range(1, num_players + 1):
         aGamePlayers.append(GamePlayer(conta_player, _name="Player " + str(conta_player), _algoritm="BJ_BASIC_STRAT", _cards=[]))
-
-
 
     before_time = time()
 
@@ -300,7 +310,6 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
 
         # print(current_deck)
 
-
         winner = run_match(current_deck, aGamePlayers, use_betting)
 
         for conta_player in range(0, len(winner)):
@@ -313,7 +322,6 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
 
             elif winner[conta_player] == "PUSH":
                 total_win_push[conta_player] = total_win_push[conta_player] + 1
-
 
         if x > 9:
             win_ratio_player = (total_win_player[0] * 100) / x
@@ -332,7 +340,7 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
                 + "{:.8f}".format(win_ratio_push) \
                 + " -- Speed: {:.2f}".format(speed) + " matches/s"
 
-            if processing_mode in ["NORMAL"]:
+            if processing_mode in ["NORMALx"]:
                 print_inline(line)
 
     if num_matches > 10:
@@ -347,9 +355,9 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
         win_ratio_dealer = (total_win_dealer[conta_player] * 100) / num_matches
         win_ratio_push = (total_win_push[conta_player] * 100) / num_matches
 
-        final_result.append((win_ratio_player, win_ratio_dealer, win_ratio_push))
+        # final_result.append((win_ratio_player, win_ratio_dealer, win_ratio_push))
 
-
+        final_result.append((round(win_ratio_player, ctNUM_PRECISION), round(win_ratio_dealer, ctNUM_PRECISION), round(win_ratio_push, ctNUM_PRECISION)))
 
     # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
 
@@ -367,7 +375,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
     winner = []
     ret_result = []
 
-
     #  create player and dealer
     # dealer = GamePlayer(0, _name="Blacu Jacku Dueler", _algoritm="DEALER", _type="DEALER", _cards=[])
     # player = GamePlayer(1, _name="Murch", _algoritm="BJ_BASIC_STRAT", _cards=[])
@@ -380,16 +387,12 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
         if use_betting is True:
             player.actual_bet = 0
 
-
     # if we are using bets, then, place bet
     if use_betting is True:
         # player.actual_bet = player.define_bet()
         for player in arrGamePlayers:
             if player.type != "DEALER":
                 player.actual_bet = player.define_bet()
-
-
-
 
     # Players get 1 card
     # player.hit(deck)
@@ -402,8 +405,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
     for dealer in arrGamePlayers:
         if dealer.type == "DEALER":
             dealer.hit(deck)
-
-
 
     # dealer reveals their first card to players
     # player.known_dealer_cards = dealer.cards[0]
@@ -423,17 +424,12 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
         if dealer.type == "DEALER":
             dealer.hit(deck)
 
-
-
     # player = GamePlayer(_name="Murch", _algoritm = "MURCH", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name="Murch", _algoritm = "SIMPLE", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck, "K"), get_card_from_deck(deck, "8") ])
 
-
     turn = "PLAYERS"
-
-
 
     while turn == "PLAYERS":
 
@@ -446,14 +442,12 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                     check_hit = player.should_hit()
 
-
                     if check_hit is True:
 
                         player.hit(deck)
 
                     else:
                         player_done = True
-
 
                     if player.get_card_sum() > 21:
 
@@ -465,7 +459,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
                         #     dealer.final_money = dealer.final_money + player.actual_bet
                         #     player.final_money = player.final_money - player.actual_bet
                         #     player.actual_bet = 0
-
 
                     else:
                         if player_done == True:
@@ -504,11 +497,7 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
         #                 if player_done == True:
         #                     winner.append("STAND")
 
-
-
         turn = "DEALER"
-
-
 
     while turn == "DEALER":
 
@@ -525,8 +514,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
                         dealer.hit(deck)
                     else:
                         dealer_done = True
-
-
 
                     if dealer.get_card_sum() > 21:
 
@@ -547,17 +534,12 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
                             # insert the result of the dealer in the 1st position of the result list
                             winner.insert(0, "STAND")
 
-
                     ls(dealer.name, ": check_hit =", check_hit, "| Cartas: ", dealer.print_hand(), dealer.get_card_sum())
 
         turn = "END"
 
-
-
-
     dealer_sum = 0
     player_sum = 0
-
 
     # check if dealer exploded. All players that are not exploded wins
     if winner[0] == "BLOW":
@@ -579,7 +561,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                 player_sum = arrGamePlayers[x].get_card_sum()
 
-
             if x > 0:
 
                 if winner[x] == "STAND":
@@ -595,7 +576,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
                         #     player.final_money = player.final_money - player.actual_bet
                         #     player.actual_bet = 0
 
-
                     elif dealer_sum < player_sum:
                         winner[x] = "PLAYER"
 
@@ -603,8 +583,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
                         #     dealer.final_money = dealer.final_money - player.actual_bet
                         #     player.final_money = player.final_money + player.actual_bet
                         #     player.actual_bet = 0
-
-
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
     ls("dealer  FINAL hand:", dealer.print_hand(), dealer.get_card_sum())
