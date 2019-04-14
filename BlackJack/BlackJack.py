@@ -22,8 +22,8 @@
 # - DONE -- Implement push (tie, when neither the player or dealer wins. Today when there is a tie, the dealer wins)
 # - TODO: Implement algorigm of Machine Learning (this is the main original goal)
 # - TODO: Implement algoritm of Card Counting (Hi-Lo ? Must me able to do 2 types of CC: One like the real world and other with simulated real decks "in mind")
-# - TODO: Implement Multithreading to compare performance. Probably worse
-# - TODO: Implement Multiprocessing by NOT using a Pool .. to compare performance
+# - DONE -- Implement Multithreading to compare performance. Probably worse
+# - DONE -- Implement Multiprocessing by NOT using a Pool .. to compare performance
 # - TODO: export lots os data and shit to use with Jupyter and Plot and Numpy and etc
 # - TODO: Implement game against a human (1 and 2 players ?)
 # - TODO: Create a GUI ?
@@ -43,6 +43,9 @@ from bib_support import print_inline, ls, get_card_val
 import BlackJack_Alg as alg
 
 
+import threading
+
+
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
 # PARAMETERS
@@ -51,12 +54,12 @@ import BlackJack_Alg as alg
 
 
 # Number of players playing the game against the dealer. Min 1, max > 1  :)
-ctNUM_PLAYERS = 1
+ctNUM_PLAYERS = 3
 
 # Number of maches being simulated
-ctNUM_MATCHES = 100000
+ctNUM_MATCHES = 10000
 
-# Type of processing the matches. Use: # MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING | NORMAL
+# Type of processing the matches. Use: NORMAL | MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING
 ctPROCESSING_MODE = "MULTIPROCESSING_POOL"
 
 # Use betting system. Place bets and try to maximize money. Balance shows in the results
@@ -69,6 +72,7 @@ ctHIT_ON_SOFT_HAND = False
 ctNUM_OF_DECKS = 6
 
 # Number os simultaneous processes or threads when using multitasks. Paralelism. Speeds up the simulation
+# in my computer and tests, the fastest value was 2 tasks
 ctNUM_SIMULTANEOUS_TASKS = 2
 
 # Precision of the numbers, when returning the statistics. Its rounded to the number of decimals defined here
@@ -215,15 +219,52 @@ def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL"
 
     win_ratio_helper = []
 
-    win_ratio_task = []
+    win_ratio_simu = []
 
     if processing_mode == "NORMAL":
-        win_ratio_task = [simulate_matches([num_matches, processing_mode, use_betting, num_players])]
 
-        win_ratio_final = win_ratio_task[0]
+        win_ratio_simu = [simulate_matches([num_matches, processing_mode, use_betting, num_players])]
+
+        # print (win_ratio_simu[0])
+
+        win_ratio_final = tuple(round(sum(y) / len(y), ctNUM_PRECISION) for y in zip(*win_ratio_simu[0]))
+
+        # win_ratio_final = win_ratio_simu[0]
 
     elif processing_mode == "MULTIPROCESSING_PROC":
-        pass
+
+        print_inline("Using multitaks. Calculating...")
+
+        print("")
+
+        jobs = []
+
+        num_matches_task = int(num_matches / (ctNUM_SIMULTANEOUS_TASKS + 1))
+        if num_matches_task == 0:
+            num_matches_task = 1
+
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+
+        jobs = []
+
+        for i in range(ctNUM_SIMULTANEOUS_TASKS):
+            p = multiprocessing.Process(target=simulate_matches, args=([num_matches_task, processing_mode, use_betting, num_players], i, return_dict))
+            jobs.append(p)
+            p.start()
+
+        for proc in jobs:
+            proc.join()
+
+        # print (return_dict.values())
+
+        for proc_num in return_dict.values():
+
+            win_ratio_helper.append(tuple(round(sum(y) / len(y), ctNUM_PRECISION) for y in zip(*proc_num)))
+
+        win_ratio_final = tuple(round(sum(y) / len(y), ctNUM_PRECISION) for y in zip(*win_ratio_helper))
+
+        print("")
 
     elif processing_mode == "MULTIPROCESSING_POOL":
 
@@ -256,12 +297,64 @@ def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL"
         print("")
 
     elif processing_mode == "MULTITHREADING":
-        pass
 
-    print("Win Ratio in", ctNUM_MATCHES, "games (player x dealer x push): ", win_ratio_final)
+        print_inline("Using multitaks. Calculating...")
+
+        print("")
+
+        num_matches_task = int(num_matches / (ctNUM_SIMULTANEOUS_TASKS + 1))
+        if num_matches_task == 0:
+            num_matches_task = 1
 
 
-def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
+        jobs = []
+
+
+
+        for proc in jobs:
+            proc.join()
+
+
+
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+
+        for i in range(ctNUM_SIMULTANEOUS_TASKS):
+            t = threading.Thread(target=simulate_matches, args=([num_matches_task, processing_mode, use_betting, num_players], i, return_dict))
+            t.daemon = True
+            jobs.append(t)
+            t.start()
+
+        for proc in jobs:
+            proc.join()
+
+        # print (return_dict.values())
+
+        for proc_num in return_dict.values():
+
+            win_ratio_helper.append(tuple(round(sum(y) / len(y), ctNUM_PRECISION) for y in zip(*proc_num)))
+
+            # print("proc_num1 = " + str(proc_num))
+            # print("win_ratio_helper = " + str(win_ratio_helper))
+
+        win_ratio_final = tuple(round(sum(y) / len(y), ctNUM_PRECISION) for y in zip(*win_ratio_helper))
+
+        # print("final = " + str(win_ratio_final))
+
+        print("")
+
+    mask = "{:." + str(ctNUM_PRECISION) + "f}"
+    # mask.format(win_ratio_final[0])
+
+    formated_result = mask.format(win_ratio_final[0]), mask.format(win_ratio_final[1]), mask.format(win_ratio_final[2])
+
+    # formated_result = []
+    # print (mask.format(win_ratio_final[0]))
+
+    print("Win Ratio in", ctNUM_MATCHES, "games (player x dealer x push): ", formated_result)
+
+
+def simulate_matches(params: list, index_proc: int = -1, return_dict: list = None) -> list:
     """
     runs the entire desired number of matches
     """
@@ -300,7 +393,12 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
 
     before_time = time()
 
-    print(str(num_players) + " player(s), 1 Dealer, " + str(ctNUM_OF_DECKS) + " decks")
+    params_used = str(num_players) + " player(s), 1 Dealer, " + str(ctNUM_OF_DECKS) + " decks, Use betting: " + str(use_betting) + ", Processing mode: " + processing_mode
+
+    if processing_mode != "NORMAL":
+        params_used = params_used + " (Tasks: " + str(ctNUM_SIMULTANEOUS_TASKS) + ")"
+
+    print(params_used)
 
     for x in range(0, num_matches):
 
@@ -360,6 +458,9 @@ def simulate_matches(params: list = [1, "NORMAL", False, 1]) -> list:
         final_result.append((round(win_ratio_player, ctNUM_PRECISION), round(win_ratio_dealer, ctNUM_PRECISION), round(win_ratio_push, ctNUM_PRECISION)))
 
     # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
+
+    if return_dict is not None:
+        return_dict[index_proc] = final_result
 
     return final_result
 
