@@ -19,3 +19,8 @@ anaconda
 
 
 https://github.com/CoreyMSchafer/dotfiles/blob/master/settings/Anaconda.sublime-settings
+
+According to my blackjack appendix 4, the probability of an overall win in blackjack is 42.22%,
+a tie is 8.48%, and a loss is 49.10%. I'm going to assume you wish to ignore ties for purposes of
+the streak. In that case, the probability of a win, given a resolved bet, is 46.36%.
+

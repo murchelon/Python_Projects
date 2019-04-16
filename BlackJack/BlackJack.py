@@ -41,7 +41,7 @@
 # - TODO: Change several aspects of the program to make it faster. like using sets and many other little changes
 # - TODO: Stop using lists ! use NumPY for everything! Performance!
 # - TODO: Implement pays more when blackjack
-# - FIX: The speed is not showing in realtime in normal mode
+# - TODO: Add SEVERAL small rules that can be found in https://en.wikipedia.org/wiki/Blackjack
 
 
 import random as rnd
@@ -66,7 +66,7 @@ import threading
 ctNUM_PLAYERS = 1
 
 # Number of maches being simulated
-ctNUM_MATCHES = 1000
+ctNUM_MATCHES = 10000
 
 # Number of complete decks of cards in play. When there are only 20% of cards in the combined decks, the dealer get a new set of decks and shuffle them
 ctNUM_OF_DECKS = 6
@@ -77,7 +77,9 @@ ctUSE_BETTING = True
 # Type of processing the matches. Use: NORMAL | MULTIPROCESSING_POOL | MULTIPROCESSING_PROC | MULTITHREADING
 ctPROCESSING_MODE = "NORMAL"
 
-# Number os simultaneous processes or threads when using multitasks. Paralelism. Speeds up the simulation
+# Number os simultaneous processes or threads when
+#
+# ultitasks. Paralelism. Speeds up the simulation
 # in my computer and tests, the fastest value was 2 tasks
 ctNUM_SIMULTANEOUS_TASKS = 2
 
@@ -103,10 +105,14 @@ class GamePlayer:
         self.cards = _cards
         self.algoritm = _algoritm.upper()
         self.known_dealer_cards = _known_dealer_cards
+
+        self.betting_algoritm = _betting_algoritm
         self.start_money = _start_money
         self.final_money = _start_money
         self.actual_bet = 0
-        self.betting_algoritm = _betting_algoritm
+
+        self.cards_splitted = []
+        self.actual_bet_splited = 0
 
     def hit(self, _deck_used: list, _card: list = []) -> None:
 
@@ -451,8 +457,12 @@ def simulate_matches(params: list, index_proc: int = -1, return_dict: list = Non
             line = "Player 1:  Win Ratio in " + "{:06d}".format(x + 1) + " games (player x dealer x push): " \
                 + "{:.8f}".format(win_ratio_player) + ", " \
                 + "{:.8f}".format(win_ratio_dealer) + ", " \
-                + "{:.8f}".format(win_ratio_push) \
-                + " -- Speed: {:.2f}".format(speed) + " matches/s"
+                + "{:.8f}".format(win_ratio_push)
+
+            if use_betting:
+                line += " -- Balance: P1$: {:.2f}".format(aGamePlayers[1].final_money) + " x {:.2f}".format(aGamePlayers[0].final_money) + " :D$"
+
+            line += " -- Speed: {:.2f}".format(speed) + " matches/s"
 
             # if processing_mode in ["NORMAL"]:
             print_inline(line)
@@ -502,11 +512,14 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
     # clean the hand and betting for the next match
     for player in arrGamePlayers:
+
         player.known_dealer_cards = []
         player.cards = []
+        player.cards_splitted = []
 
         if use_betting is True:
             player.actual_bet = 0
+            player.actual_bet_splitted = 0
 
     # if we are using bets, then, place bet
     if use_betting is True:
@@ -553,6 +566,12 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
     # arrGamePlayers[0].cards = [['8', '♣'], ['10', '♦']]
     # arrGamePlayers[1].cards = [['K', '♣'], ['3', '♠'], ['6', '♣']]
 
+    # arrGamePlayers[0].cards = [['6', '♥'], ['Q', '♦'], ['9', '♥']]
+    # arrGamePlayers[1].cards = [['8', '♦'], ['6', '♣']]
+
+    # arrGamePlayers[0].cards = [['8', '♥'], ['5', '♥'], ['7', '♠']]
+    # arrGamePlayers[1].cards = [['3', '♦'], ['2', '♣'], ['4', '♥'], ['3', '♥'], ['K', '♣']]
+
     turn = "PLAYERS"
 
     while turn == "PLAYERS":
@@ -579,10 +598,9 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                         player_done = True
 
-                        if use_betting is True:
-                            arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + player.actual_bet
-                            player.final_money = player.final_money - player.actual_bet
-                            player.actual_bet = 0
+                        # if use_betting is True:
+                        #     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + player.actual_bet
+                        #     player.final_money = player.final_money - player.actual_bet
 
                     else:
                         if player_done == True:
@@ -613,10 +631,11 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                         dealer_done = True
 
-                        if use_betting is True:
-                            arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - player.actual_bet
-                            player.final_money = player.final_money + player.actual_bet
-                            player.actual_bet = 0
+                        # if use_betting is True:
+                        #     # if player is already blown, dont give him money!
+                        #     if player.get_card_sum() <= 21:
+                        #         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - player.actual_bet
+                        #         player.final_money = player.final_money + player.actual_bet
 
                         ls(dealer.name, "exploded!")
 
@@ -638,12 +657,18 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
         for x in range(0, len(winner)):
             if x > 0:
                 if winner[x] == "STAND":
+
                     winner[x] = "PLAYER"
 
                     if use_betting is True:
                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet
                         arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
-                        arrGamePlayers[x].actual_bet = 0
+
+                elif winner[x] == "DEALER":
+
+                    if use_betting is True:
+                        arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
+                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
     else:
 
@@ -663,7 +688,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                     if dealer_sum == player_sum:
                         winner[x] = "PUSH"
-                        arrGamePlayers[x].actual_bet = 0
 
                     elif dealer_sum > player_sum:
                         winner[x] = "DEALER"
@@ -671,7 +695,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
                         if use_betting is True:
                             arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
                             arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
-                            arrGamePlayers[x].actual_bet = 0
 
                     elif dealer_sum < player_sum:
                         winner[x] = "PLAYER"
@@ -679,7 +702,12 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
                         if use_betting is True:
                             arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet
                             arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
-                            arrGamePlayers[x].actual_bet = 0
+
+                elif winner[x] == "DEALER":
+
+                    if use_betting is True:
+                        arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
+                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
     ls("dealer  FINAL hand:", dealer.print_hand(), dealer.get_card_sum())
@@ -688,6 +716,10 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
     ls("=== FINAL ===========================================")
 
     ls("\n\n")
+
+    # print(winner)
+    # print(arrGamePlayers[0].cards)
+    # print(arrGamePlayers[1].cards)
 
     return winner[1:]
 
