@@ -68,8 +68,6 @@ import BlackJack_Alg as alg
 import BlackJack_BetAlg as bet_alg
 
 
-
-
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
 # PARAMETERS
@@ -81,10 +79,10 @@ import BlackJack_BetAlg as bet_alg
 ctNUM_PLAYERS = 1
 
 # Define the strategy algoritm. All players use the same. Dealer uses its won.
-ctSTRAT_ALGORITM = "BJ_BASIC_STRAT"
+ctSTRAT_ALGORITM = "BJ_BASIC_STRAT_FULL"
 
 # Number of maches being simulated
-ctNUM_MATCHES = 1000
+ctNUM_MATCHES = 100000
 
 # Number of complete decks of cards in play. When there are only 20% of cards in the combined decks, the dealer get a new set of decks and shuffle them
 ctNUM_OF_DECKS = 6
@@ -107,6 +105,9 @@ ctNUM_PRECISION = 8
 
 # Dealer must hit on soft 17 (when have an ACE and a 6) ? If not, will hit when sum of cards <= 16, else hit on <= 17 if have an ACE or hit when <= 16 when doesnt have an ACE
 ctHIT_ON_SOFT_HAND = False
+
+# Enable the player to split cards when he has a hand that are made of equal cards, on the first hand
+ctUSE_SPLITTING = True
 
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +132,6 @@ class GamePlayer:
             self.betting_algoritm = _betting_algoritm
 
         self.known_dealer_cards = _known_dealer_cards
-
 
         self.start_money = _start_money
         self.final_money = _start_money
@@ -184,16 +184,14 @@ class GamePlayer:
 
         return sum_
 
-    def should_hit(self, _force: bool = None) -> bool:
+    def get_next_action(self, _force: str = None) -> str:
 
         ret = False
-
-        avaliable_algs = ["NEVER", "ALWAYS", "50X50", "BJ_BASIC_STRAT", "MURCH", "DEALER"]
 
         if _force is None:
 
             # test if the selected alg is implemented
-            if self.algoritm not in avaliable_algs:
+            if self.algoritm not in alg.AVALIABLE_ALGS:
                 raise ValueError("The selected algoritm is not implemented. Selected: " + self.algoritm + " | Avaliable: " + str(avaliable_algs))
 
             # check witch alg to use and use it
@@ -203,8 +201,11 @@ class GamePlayer:
             elif self.algoritm == "50X50":
                 ret = alg.blackjack_alg_50X50()
 
-            elif self.algoritm == "BJ_BASIC_STRAT":
-                ret = alg.blackjack_alg_BJ_BASIC_STRAT(self)
+            elif self.algoritm == "BJ_BASIC_STRAT_FULL":
+                ret = alg.blackjack_alg_BJ_BASIC_STRAT_FULL(self, ctHIT_ON_SOFT_HAND)
+
+            elif self.algoritm == "BJ_BASIC_STRAT_NOSPLIT_NODOUBLE":
+                ret = alg.blackjack_alg_BJ_BASIC_STRAT_NOSPLIT_NODOUBLE(self)
 
             elif self.algoritm == "MURCH":
                 ret = alg.blackjack_alg_MURCH(self)
@@ -214,14 +215,14 @@ class GamePlayer:
 
             # if has 21 or more, always say no to hit
             if self.get_card_sum() >= 21:
-                ret = False
+                ret = "STAND"
 
              # hard coded always and never, for tests. Last test so it prevales from any other test
             if self.algoritm == "NEVER":
-                ret = False
+                ret = "STAND"
 
             elif self.algoritm == "ALWAYS":
-                ret = True
+                ret = "HIT"
 
             return ret
 
@@ -248,7 +249,6 @@ class GamePlayer:
 
         else:
             return _force
-
 
     def can_split(self) -> bool:
 
@@ -592,22 +592,6 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
         if dealer.type == "DEALER":
             dealer.hit(deck)
 
-    # check if player will split
-    for player in arrGamePlayers:
-        if player.type != "DEALER":
-
-            if player.can_split() is True:
-
-                player.cards_splitted = [player.cards[1]]
-                player.cards = [player.cards[0]]
-
-                if use_betting is True:
-
-                    player.actual_bet_splitted = player.actual_bet
-
-
-
-
     # player = GamePlayer(_name="Murch", _algoritm = "MURCH", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name="Murch", _algoritm = "SIMPLE", _cards=[get_card_from_deck(deck), get_card_from_deck(deck)])
     # player = GamePlayer(_name = "Murch", _cards = [ get_card_from_deck(deck), get_card_from_deck(deck) ])
@@ -622,6 +606,10 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
     # arrGamePlayers[0].cards = [['8', '♥'], ['5', '♥'], ['7', '♠']]
     # arrGamePlayers[1].cards = [['3', '♦'], ['2', '♣'], ['4', '♥'], ['3', '♥'], ['K', '♣']]
 
+    # arrGamePlayers[1].cards = [['A', '♣'], ['A', '♦'], ['K', '♦']]
+    # arrGamePlayers[1].cards = [['A', '♥'], ['3', '♦'], ['4', '♠']]
+
+
     turn = "PLAYERS"
 
     while turn == "PLAYERS":
@@ -633,13 +621,26 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                 while player_done is False:
 
-                    check_hit = player.should_hit()
+                    check_hit = player.get_next_action()
 
-                    if check_hit is True:
+                    if check_hit == "HIT":
 
                         player.hit(deck)
 
-                    else:
+                    elif check_hit == "SPLIT":
+
+                        player.hit(deck)
+
+                    elif check_hit == "DOUBLE":
+
+                        player.hit(deck)
+
+                    elif check_hit == "SURRENDER":
+
+                        player.hit(deck)
+
+                    elif check_hit == "STAND":
+
                         player_done = True
 
                     if player.get_card_sum() > 21:
@@ -663,9 +664,9 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                 while dealer_done is False:
 
-                    check_hit = dealer.should_hit()
+                    check_hit = dealer.get_next_action()
 
-                    if check_hit is True:
+                    if check_hit == "HIT":
                         dealer.hit(deck)
                     else:
                         dealer_done = True
