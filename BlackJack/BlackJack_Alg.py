@@ -248,24 +248,24 @@ def blackjack_alg_BJ_BASIC_STRAT_FULL(caller: object,
             #
             # Dealer ->             2   3   4   5   6   7   8   9   10  A
             # Player -> 17–20       S   S   S   S   S   S   S   S   S   S
-                        # Player -> 16          S   S   S   S   S   H   H   SU  SU  SU
-                        # Player -> 15          S   S   S   S   S   H   H   H   SU  H
-                        # Player -> 13–14       S   S   S   S   S   H   H   H   H   H
-                        # Player -> 12          H   H   S   S   S   H   H   H   H   H
-                        # Player -> 11          Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh
-                        # Player -> 10          Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh  H   H
-                        # Player -> 9           H   Dh  Dh  Dh  Dh  H   H   H   H   H
-                        # Player -> 5–8         H   H   H   H   H   H   H   H   H   H
+            # Player -> 16          S   S   S   S   S   H   H   SU  SU  SU
+            # Player -> 15          S   S   S   S   S   H   H   H   SU  H
+            # Player -> 13–14       S   S   S   S   S   H   H   H   H   H
+            # Player -> 12          H   H   S   S   S   H   H   H   H   H
+            # Player -> 11          Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh
+            # Player -> 10          Dh  Dh  Dh  Dh  Dh  Dh  Dh  Dh  H   H
+            # Player -> 9           H   Dh  Dh  Dh  Dh  H   H   H   H   H
+            # Player -> 5–8         H   H   H   H   H   H   H   H   H   H
 
-                        # S = Stand
-                        # H = Hit
-                        # Dh = Double (if not allowed, then hit)
-                        # Ds = Double (if not allowed, then stand)
-                        # SP = Split
-                        # SU = Surrender (if not allowed, then hit)
+            # S = Stand
+            # H = Hit
+            # Dh = Double (if not allowed, then hit)
+            # Ds = Double (if not allowed, then stand)
+            # SP = Split
+            # SU = Surrender (if not allowed, then hit)
 
-                        # Dealer ->             2   3   4   5   6   7   8   9   10  A
-                        # Player -> 5–8         H   H   H   H   H   H   H   H   H   H
+            # Dealer ->             2   3   4   5   6   7   8   9   10  A
+            # Player -> 5–8         H   H   H   H   H   H   H   H   H   H
             if card_sum <= 8:
 
                 ret = "HIT"

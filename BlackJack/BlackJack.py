@@ -3,11 +3,13 @@
 #
 # Blackjack game created to help me learn python.
 # The goal is make a program that can play by it's own
-# and show the statistics envolved.
+# and show the statistics envolved. Expanded to be an real, rich, fast and reliable
+# player strategy test ambient
 #
 # Features:
 # =========
 #
+# - Algoritm that trys to mimic reality the best it cans. The goal is to use ALL rules in BJ and try to create a fast and real envirolment to try differente alooritms to beat the dealer
 # - Can use several players with and a dealer
 # - hability to use real decks with cards and suits
 # - able to use different algoritms to decide if hit ot not
@@ -51,11 +53,18 @@
 # - If using more them one player, the results of them are combined averaged
 # - If using more them one task, the results of them are combined averaged
 # - The number of decks may be increased in order to accomodade the number of players
-# - If the remaining cards in the deck are only 20%, then get new shuffled decks up tho the amount of decks defined in the param
+# - If the remaining cards in the deck are only ctRESHUFFLE_DECK_PERC (in percentual), then get new shuffled decks up tho the amount of decks defined in the param
 # - If player blows, the dealer wins even before he plays (make a huge difference, giving more advantage to the dealer)
 # - Can only split once, having 2 game at once
-# - Can only split if the FIRST 1 cards are equal
-
+# - Can only split if the FIRST 2 cards are equal. First hand
+#
+#
+# References:
+#
+# https://pdfs.semanticscholar.org/e1dd/06616e2d18179da7a3643cb3faab95222c8b.pdf
+# https://www.888casino.com/blog/blackjack-strategy-guide
+# https://www.888casino.com/blog/advantage-play/an-introduction-to-advanced-advantage-play
+# https://www.888casino.com/blog/blackjack-tips/why-not-mimic-the-dealer-playing-strategy
 
 import random as rnd
 import multiprocessing
@@ -107,7 +116,19 @@ ctNUM_PRECISION = 8
 ctHIT_ON_SOFT_HAND = False
 
 # Enable the player to split cards when he has a hand that are made of equal cards, on the first hand
-ctUSE_SPLITTING = True
+ctALLOW_SPLITTING = True
+
+# Enable the player to double the bet in some situations.
+ctALLOW_DOUBLE = False
+
+# Enable the player to surrender in some situations.
+ctALLOW_SURRENDER = False
+
+# Sets the moment when the deck being used is discarded and the dealer gets new shuffled decks.
+# Define the percentual from the decks being used with remaining cards. If its set to 0.2 it means the game will
+# get new set of ctNUM_OF_DECKS shuffled to continue the game, when there are 20% of the total number of cards
+# that originaly were in the decks
+ctRESHUFFLE_DECK_PERC = 0.20
 
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +223,7 @@ class GamePlayer:
                 ret = alg.blackjack_alg_50X50()
 
             elif self.algoritm == "BJ_BASIC_STRAT_FULL":
-                ret = alg.blackjack_alg_BJ_BASIC_STRAT_FULL(self, ctHIT_ON_SOFT_HAND)
+                ret = alg.blackjack_alg_BJ_BASIC_STRAT_FULL(self, ctHIT_ON_SOFT_HAND, ctALLOW_SPLITTING, ctALLOW_DOUBLE, ctALLOW_SURRENDER)
 
             elif self.algoritm == "BJ_BASIC_STRAT_NOSPLIT_NODOUBLE":
                 ret = alg.blackjack_alg_BJ_BASIC_STRAT_NOSPLIT_NODOUBLE(self)
@@ -253,8 +274,10 @@ class GamePlayer:
     def can_split(self) -> bool:
 
         if len(self.cards) == 2:
-            if self.cards[0][0] == self.cards[1][0]:
-                return True
+
+            if self.cards_splitted == []:
+                if self.cards[0][0] == self.cards[1][0]:
+                    return True
 
         return False
 
@@ -459,7 +482,7 @@ def simulate_matches(params: list, index_proc: int = -1, return_dict: list = Non
     for x in range(0, num_matches):
 
         # if there are less then 20 cards in deck, get new decks
-        if len(current_deck) <= int(ctNUM_OF_DECKS * 52 * 0.2):
+        if len(current_deck) <= int(ctNUM_OF_DECKS * 52 * ctRESHUFFLE_DECK_PERC):
             current_deck = new_deck(number_of_decks_used=ctNUM_OF_DECKS)
 
         # print(current_deck)
@@ -609,17 +632,24 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
     # arrGamePlayers[1].cards = [['A', '♣'], ['A', '♦'], ['K', '♦']]
     # arrGamePlayers[1].cards = [['A', '♥'], ['3', '♦'], ['4', '♠']]
 
-
     turn = "PLAYERS"
 
     while turn == "PLAYERS":
 
         for player in list(arrGamePlayers):
+
             if player.type != "DEALER":
 
                 player_done = False
 
                 while player_done is False:
+
+                    # Hand number. If not splitted, then the hand number is 0.
+                    # if splitted then hand number can be 0 or 1, deppending on witch hand we are
+                    # working on: the original or the splitted
+                    hand_splitted = 0
+
+                    # for hand in range(0, hand_number + 1)
 
                     check_hit = player.get_next_action()
 
@@ -629,7 +659,23 @@ def run_match(deck: list, arrGamePlayers: object, use_betting: bool = False) -> 
 
                     elif check_hit == "SPLIT":
 
-                        player.hit(deck)
+                        if ctALLOW_SPLITTING:
+
+                            if player.can_split():
+
+                                player.cards_splitted = [player.cards[1]]
+                                player.cards = [player.cards[0]]
+
+                                if use_betting is True:
+                                    player.actual_bet_splitted = player.actual_bet
+
+                                player.hit(deck)
+
+                            else:
+                                player.hit(deck)
+
+                        else:
+                            player.hit(deck)
 
                     elif check_hit == "DOUBLE":
 
