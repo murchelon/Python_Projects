@@ -12,23 +12,24 @@ def blackjack_alg_DEALER(caller: object, hit_on_soft_hand: bool = False) -> str:
 
     ret = None
 
-    num_of_aces = len([x[0] for x in caller.cards if x[0] == "A"])
+    # num_of_aces = len([x[0] for x in caller.cards if x[0] == "A"])
 
     card_sum = caller.get_card_sum()
 
     if card_sum <= 16:
+
         ret = "HIT"
 
     elif card_sum == 17:
+
         if hit_on_soft_hand is False:
             ret = "STAND"
         else:
-            if num_of_aces >= 1:
-                ret = "HIT"
-            else:
-                ret = "HIT"
+            ret = "HIT"
+
     else:
-        ret = False
+
+        ret = "STAND"
 
     return ret
 
@@ -46,6 +47,7 @@ def blackjack_alg_50X50() -> str:
 
 
 def blackjack_alg_BJ_BASIC_STRAT_FULL(caller: object,
+                                      hand_number: int,
                                       hit_on_soft: bool = False,
                                       allow_split: bool = True,
                                       allow_double: bool = False,
@@ -53,9 +55,17 @@ def blackjack_alg_BJ_BASIC_STRAT_FULL(caller: object,
 
     # https://en.wikipedia.org/wiki/Blackjack#Basic_strategy
 
-    num_of_aces = len([x[0] for x in caller.cards if x[0] == "A"])
+    if allow_split:
+        if hand_number == 0:
+            cards = caller.cards
+        else:
+            cards = caller.cards_splitted
+    else:
+        cards = caller.cards
 
-    card_sum = caller.get_card_sum()
+    num_of_aces = len([x[0] for x in cards if x[0] == "A"])
+
+    card_sum = caller.get_card_sum(_hand_number=hand_number)
 
     # we should never use this alg for the dealer beause the alg
     # depends on the dealer first card.. witch doesnt exists when
@@ -81,16 +91,16 @@ def blackjack_alg_BJ_BASIC_STRAT_FULL(caller: object,
     found_total_match = False
 
     # check if we have a pair in the first hand, in the begining of the game
-    if len(caller.cards) == 2:
+    if len(cards) == 2:
 
         pairs = []
-        pairs.append(["A", len([x[0] for x in caller.cards if x[0] == "A"])])
-        pairs.append(["J", len([x[0] for x in caller.cards if x[0] == "J"])])
-        pairs.append(["Q", len([x[0] for x in caller.cards if x[0] == "Q"])])
-        pairs.append(["K", len([x[0] for x in caller.cards if x[0] == "K"])])
+        pairs.append(["A", len([x[0] for x in cards if x[0] == "A"])])
+        pairs.append(["J", len([x[0] for x in cards if x[0] == "J"])])
+        pairs.append(["Q", len([x[0] for x in cards if x[0] == "Q"])])
+        pairs.append(["K", len([x[0] for x in cards if x[0] == "K"])])
 
         for k in range(2, 11):
-            pairs.append([str(k), len([x[0] for x in caller.cards if x[0] == str(k)])])
+            pairs.append([str(k), len([x[0] for x in cards if x[0] == str(k)])])
 
         for pair in pairs:
 
@@ -562,7 +572,7 @@ def blackjack_alg_BJ_BASIC_STRAT_FULL(caller: object,
     #         ret = "STAND"
 
     # if ret == None:
-    #     print(caller.cards)
+    #     print(cards)
 
     return ret
 

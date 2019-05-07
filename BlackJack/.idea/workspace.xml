@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bc13020c-68e4-4ac6-a07c-fa3f08859b3f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlackJack.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlackJack.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlackJack_Alg.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlackJack_Alg.py" afterDir="false" />
     </list>
@@ -14,20 +13,38 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BlackJack.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-281">
-              <caret line="652" selection-start-line="652" selection-end-line="652" />
+            <state relative-caret-position="74">
+              <caret line="981" column="51" lean-forward="true" selection-start-line="981" selection-start-column="51" selection-end-line="981" selection-end-column="51" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="324" selection-start-line="324" selection-end-line="324" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="17" selection-start-line="17" selection-end-line="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="339">
-              <caret line="47" column="53" lean-forward="true" selection-start-line="47" selection-start-column="53" selection-end-line="47" selection-end-column="53" />
+            <state relative-caret-position="117">
+              <caret line="33" selection-start-line="33" selection-end-line="33" />
               <folding>
                 <element signature="e#1#21#0" expanded="true" />
               </folding>
@@ -56,7 +73,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bib_support.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
+            <state relative-caret-position="187">
               <caret line="28" selection-start-line="28" selection-end-line="28" />
             </state>
           </provider>
@@ -73,16 +90,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>luck</find>
-      <find>temp</find>
-      <find>get_card_val</find>
-      <find>table</find>
-      <find>num_matches</find>
-      <find>bet</find>
-      <find>known_table_cards</find>
-      <find>known_dealer_card_value</find>
-      <find>simula</find>
-      <find>before_time</find>
       <find>speed</find>
       <find>Simulating</find>
       <find>win_ratio_task</find>
@@ -102,6 +109,17 @@
       <find>splited</find>
       <find>should_hit</find>
       <find>shuff</find>
+      <find>run_match</find>
+      <find>winner</find>
+      <find>player.cards_splitted =</find>
+      <find>cards_splitted</find>
+      <find>get_next_action</find>
+      <find>get_card_sum</find>
+      <find>hit_on_soft</find>
+      <find>cards_splited</find>
+      <find>splited_results</find>
+      <find>|</find>
+      <find>_local_wins[0]</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -120,7 +138,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="22" />
     <option name="width" value="1440" />
     <option name="height" value="874" />
@@ -238,16 +256,16 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1440" height="874" extended-state="0" />
+    <frame x="-5" y="22" width="1440" height="874" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49187434" visible="true" weight="0.14023961" />
       <window_info id="Structure" order="1" sideWeight="0.5092308" side_tool="true" weight="0.14646997" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32992327" />
       <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4982382" visible="true" weight="0.29539642" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.29283887" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.5920716" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49964765" weight="0.32992327" />
@@ -265,18 +283,48 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/BlackJack_Alg.py</url>
-          <line>713</line>
+          <line>723</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/BlackJack_Alg.py</url>
-          <line>83</line>
-          <option name="timeStamp" value="10" />
+          <url>file://$PROJECT_DIR$/BlackJack.py</url>
+          <line>816</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/BlackJack.py</url>
-          <line>650</line>
-          <option name="timeStamp" value="11" />
+          <line>777</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/BlackJack.py</url>
+          <line>807</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/BlackJack.py</url>
+          <line>801</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/BlackJack.py</url>
+          <line>1106</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/BlackJack.py</url>
+          <line>1006</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/BlackJack.py</url>
+          <line>1010</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/BlackJack.py</url>
+          <line>950</line>
+          <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -311,6 +359,13 @@
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>player.get_card_sum(_hand_number=hand)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Main2.py" />
@@ -322,21 +377,6 @@
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/multiprocessing/process.py" />
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/multiprocessing/pool.py" />
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/multiprocessing/util.py" />
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py" />
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/BlackJack.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-281">
-          <caret line="652" selection-start-line="652" selection-end-line="652" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Anottations.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -351,20 +391,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/bib_support.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
+        <state relative-caret-position="187">
           <caret line="28" selection-start-line="28" selection-end-line="28" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
-          <caret line="47" column="53" lean-forward="true" selection-start-line="47" selection-start-column="53" selection-end-line="47" selection-end-column="53" />
+        <state relative-caret-position="117">
+          <caret line="33" selection-start-line="33" selection-end-line="33" />
           <folding>
             <element signature="e#1#21#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="324" selection-start-line="324" selection-end-line="324" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BlackJack.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="74">
+          <caret line="981" column="51" lean-forward="true" selection-start-line="981" selection-start-column="51" selection-end-line="981" selection-end-column="51" />
         </state>
       </provider>
     </entry>
