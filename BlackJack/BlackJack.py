@@ -91,7 +91,7 @@ ctNUM_PLAYERS = 1
 ctSTRAT_ALGORITM = "BJ_BASIC_STRAT_FULL"
 
 # Number of maches being simulated
-ctNUM_MATCHES = 100000
+ctNUM_MATCHES = 30000
 
 # Number of complete decks of cards in play. When there are only 20% of cards in the combined decks, the dealer get a new set of decks and shuffle them
 ctNUM_OF_DECKS = 6
@@ -642,7 +642,7 @@ def simulate_matches(params: list, index_proc: int = -1, return_dict: list = Non
 
                     _win_count = _win_count + 1
 
-        if x > 9:
+        if x > 20:
             win_ratio_player = (total_win_player[0] * 100) / (x + split_count)
             win_ratio_dealer = (total_win_dealer[0] * 100) / (x + split_count)
             win_ratio_push = (total_win_push[0] * 100) / (x + split_count)
@@ -653,18 +653,22 @@ def simulate_matches(params: list, index_proc: int = -1, return_dict: list = Non
                 speed = x / (passed_time)
             # check_sum = win_ratio_player + win_ratio_dealer + win_ratio_push
 
-            line = "RealTime: Player 1:  Win Ratio in " + "{:06d}".format(x + 1) + " games (player x dealer x push): " \
+            line = "RealTime: Proc1, P1:  Win Ratio in " + "{:06d}".format(x + 1) + " games (player x dealer x push): " \
                 + "{:.8f}".format(win_ratio_player) + ", " \
                 + "{:.8f}".format(win_ratio_dealer) + ", " \
                 + "{:.8f}".format(win_ratio_push)
 
             if ctUSE_BETTING:
-                line += " -- Balance: P1$: {:.2f}".format(aGamePlayers[1].final_money) + " x {:.2f}".format(aGamePlayers[0].final_money) + " :D$"
+                line += " -- P1$: {:.2f}".format(aGamePlayers[1].final_money) + " x {:.2f}".format(aGamePlayers[0].final_money) + " :D$"
 
-            line += " -- Speed: {:.2f}".format(speed) + " matches/s"
 
-            # if processing_mode in ["NORMAL"]:
-            print_inline(line)
+            if ctALLOW_SPLITTING:
+                line += " -- " + str(split_count) + " splits"
+
+            line += " -- {:.2f}".format(speed) + " matches/s"
+
+            if index_proc in [-1, 0] or processing_mode == "NORMAL":
+                print_inline(line)
 
     if num_matches > 10:
         if processing_mode in ["NORMAL"]:
