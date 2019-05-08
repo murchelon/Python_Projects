@@ -23,12 +23,13 @@
 # T O D O List:
 # =============
 #
-# - TODO: Implement double down, surrender, insurance, the amout payied for insurance, the amout payed by blackjack .. all in parameters
+# - TODO: Implement surrender, insurance, the amout payied for insurance, the amout payed by blackjack .. all in parameters
 # - DONE -- Fix the order of the dealed cards. They have an order... and it must be followed
 # - TODO: make this program be able to play against flash sites with bj games
-# - TODO: Implement spliting of cards
-# - TODO: Implement betting
+# - DONE -- Implement spliting of cards
+# - DONE -- Implement betting
 # - DONE -- Implement push (tie, when neither the player or dealer wins. Today when there is a tie, the dealer wins)
+# - DONE -- Implement double
 # - TODO: Implement algorigm of Machine Learning (this is the main original goal)
 # - TODO: Implement algoritm of Card Counting (Hi-Lo ? Must me able to do 2 types of CC: One like the real world and other with simulated real decks "in mind")
 # - DONE -- Implement Multithreading to compare performance. Probably worse
@@ -36,13 +37,13 @@
 # - TODO: export lots os data and shit to use with Jupyter and Plot and Numpy and etc
 # - TODO: Implement game against a human (1 and 2 players ?)
 # - TODO: Create a GUI ?
-# - TODO: Find a way to show progress when in multiprocessing mode
+# - DONE -- Find a way to show progress when in multiprocessing mode
 # - DONE -- Support more then 1 player (computer dealer x computer x computer...)
 # - DONE -- Implement some way of measuring the speed, like 2323 matches / sec
 # - DONE -- Implement a real behavior for the dealer. Follow bj rules for dealer
 # - TODO: Change several aspects of the program to make it faster. like using sets and many other little changes
 # - TODO: Stop using lists ! use NumPY for everything! Performance!
-# - TODO: Implement pays more when blackjack
+# - TODO: Implement pays more when blackjack (natural)
 # - TODO: Add SEVERAL small rules that can be found in https://en.wikipedia.org/wiki/Blackjack
 #
 # RULES and DETAILS:
@@ -119,7 +120,7 @@ ctHIT_ON_SOFT_HAND = False
 ctALLOW_SPLITTING = True
 
 # Enable the player to double the bet in some situations.
-ctALLOW_DOUBLE = False
+ctALLOW_DOUBLE = True
 
 # Enable the player to surrender in some situations.
 ctALLOW_SURRENDER = False
@@ -691,8 +692,40 @@ def simulate_matches(params: list, index_proc: int = -1, return_dict: list = Non
         print("")
         print("BALANCE:")
 
+        reminder = 0
+
         for conta_player in range(0, num_players + 1):
-            print("Start: " + str("{:.2f}".format(round(aGamePlayers[conta_player].start_money, 2))) + " | End: " + str("{:.2f}".format(round(aGamePlayers[conta_player].final_money, 2))) + "   -- " + aGamePlayers[conta_player].name)
+
+            if conta_player == 0:
+
+                print("Start: " + str("{:.2f}".format(round(aGamePlayers[conta_player].start_money, 2))) + " | End: " + str("{:.2f}".format(round(aGamePlayers[conta_player].final_money, 2))) + "   -- " + aGamePlayers[conta_player].name)
+
+            else:
+
+                if num_players > 0:
+
+
+                    reminder += round(aGamePlayers[conta_player].final_money, 2)
+
+                    print("Start: " + str("{:.2f}".format(round(aGamePlayers[conta_player].start_money, 2))) + " | End: " + str("{:.2f}".format(round(aGamePlayers[conta_player].final_money, 2))) + "   -- " + aGamePlayers[conta_player].name)
+
+                else:
+
+                    reminder = (round(aGamePlayers[0].final_money, 2) + round(aGamePlayers[conta_player].final_money, 2)) - (aGamePlayers[0].start_money + aGamePlayers[conta_player].start_money)
+
+                    print("Start: " + str("{:.2f}".format(round(aGamePlayers[conta_player].start_money, 2))) + " | End: " + str("{:.2f}".format(round(aGamePlayers[conta_player].final_money, 2))) + " | rem = " + str(reminder) + "   -- " + aGamePlayers[conta_player].name)
+
+
+        if num_players > 0:
+
+            reminder = reminder + round(aGamePlayers[0].final_money, 2)
+
+            for conta_player in range(0, num_players + 1):
+
+                reminder = reminder - round(aGamePlayers[conta_player].start_money, 2)
+
+            print("rem = " + str(reminder))
+
         print("")
 
     return final_result
@@ -733,34 +766,34 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
         for player in arrGamePlayers:
             if player.type != "DEALER":
+
+                # define the players bet based in the selected algoritm
                 player.actual_bet = player.define_bet_value()
 
+                # subtract the bet from player, when starting game
+                player.final_money = player.final_money - player.actual_bet
+
     # Players get 1 card
-    # player.hit(deck)
     for player in arrGamePlayers:
         if player.type != "DEALER":
             player.hit(deck)
 
     # Dealer get 1 card face up
-    # dealer.hit(deck)
     for dealer in arrGamePlayers:
         if dealer.type == "DEALER":
             dealer.hit(deck)
 
     # dealer reveals their first card to players
-    # player.known_dealer_cards = dealer.cards[0]
     for player in arrGamePlayers:
         if player.type != "DEALER":
             player.known_dealer_cards = arrGamePlayers[0].cards[0]
 
     # Players get 1 more card
-    # player.hit(deck)
     for player in arrGamePlayers:
         if player.type != "DEALER":
             player.hit(deck)
 
     # Dealer get 1 more card face down
-    # dealer.hit(deck)
     for dealer in arrGamePlayers:
         if dealer.type == "DEALER":
             dealer.hit(deck)
@@ -835,7 +868,10 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                 if ctUSE_BETTING is True:
 
+                                    # subtracts another bet from player
                                     player.final_money = player.final_money - player.actual_bet
+
+                                    # put the same bet value in the new splitted cards
                                     player.actual_bet_splitted = player.actual_bet
 
                             else:
@@ -846,7 +882,26 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                     elif check_hit == "DOUBLE":
 
-                        player.hit(_deck_used=deck, _hand_number=hand)
+                        if ctUSE_BETTING is True:
+
+                            if hand == 0:
+                                player.final_money = player.final_money - player.actual_bet
+                                player.actual_bet = player.actual_bet * 2
+
+                            else:
+                                player.final_money = player.final_money - player.actual_bet
+                                player.actual_bet_splitted = player.actual_bet_splitted * 2
+
+                            player.hit(_deck_used=deck, _hand_number=hand)
+
+                            if total_hands_number > 0:
+                                goto_next_hand = True
+                            else:
+                                player_done = True
+                        else:
+
+                            player.hit(_deck_used=deck, _hand_number=hand)
+
 
                     elif check_hit == "SURRENDER":
 
@@ -883,7 +938,7 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                     else:
 
-                        if check_hit == "STAND":
+                        if check_hit == "STAND" or check_hit == "DOUBLE":
 
                             if total_hands_number > 0:
 
@@ -960,14 +1015,22 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
                     winner[x] = "PLAYER"
 
                     if ctUSE_BETTING is True:
+
+                        # subtracts the dealer
                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet
-                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+
+                        # pays the player. times 1 because we return the bet and pay the bet
+                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + (arrGamePlayers[x].actual_bet * 2)
 
                 elif winner[x] == "DEALER":
 
                     if ctUSE_BETTING is True:
+
+                        # adds to the dealer
                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
+
+                        # dont do anything to the player because he has already gave money when placing bet and recieving cards
+                        # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
                 # search for the | indicating that it was a splitted hand and have 2 possible values for winnings
                 elif winner[x].find("|") > 0:
@@ -984,11 +1047,11 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                 if _win_count == 0:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet
-                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + (arrGamePlayers[x].actual_bet * 2)
 
                                 elif _win_count == 1:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet_splitted
-                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet_splitted
+                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + (arrGamePlayers[x].actual_bet_splitted * 2)
 
                         elif win == "DEALER":
 
@@ -998,11 +1061,11 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                 if _win_count == 0:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
+                                    # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
                                 elif _win_count == 1:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet_splitted
-                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
+                                    # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
 
                         _win_count = _win_count + 1
 
@@ -1026,19 +1089,23 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
                     if dealer_sum == player_sum:
                         winner[x] = "PUSH"
 
+                        if ctUSE_BETTING is True:
+                            # arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
+                            arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+
                     elif dealer_sum > player_sum:
                         winner[x] = "DEALER"
 
                         if ctUSE_BETTING is True:
                             arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-                            arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
+                            # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
                     elif dealer_sum < player_sum:
                         winner[x] = "PLAYER"
 
                         if ctUSE_BETTING is True:
                             arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet
-                            arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+                            arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + (arrGamePlayers[x].actual_bet * 2)
 
                 elif winner[x] == "DEALER":
 
@@ -1046,7 +1113,7 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                     if ctUSE_BETTING is True:
                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
+                        # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
                 # search for the | indicating that it was a splitted hand and have 2 possible values for winnings
                 elif winner[x].find("|") > 0:
@@ -1063,6 +1130,11 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
                             if dealer_sum == player_sum:
                                 _local_wins.append("PUSH")
 
+                                if ctUSE_BETTING is True:
+                                    # arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
+                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+
+
                             elif dealer_sum > player_sum:
                                 _local_wins.append("DEALER")
 
@@ -1070,11 +1142,11 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                     if _win_count == 0:
                                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
+                                        # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
                                     elif _win_count == 1:
                                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet_splitted
-                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
+                                        # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
 
                             elif dealer_sum < player_sum:
                                 _local_wins.append("PLAYER")
@@ -1083,11 +1155,11 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                     if _win_count == 0:
                                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet
-                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + (arrGamePlayers[x].actual_bet * 2)
 
                                     elif _win_count == 1:
                                         arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet_splitted
-                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet_splitted
+                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + (arrGamePlayers[x].actual_bet_splitted * 2)
 
                         elif win == "DEALER":
 
@@ -1097,11 +1169,11 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                 if _win_count == 1:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
+                                    # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
                                 elif _win_count == 2:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet_splitted
-                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
+                                    # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
 
                         _win_count = _win_count + 1
 
@@ -1109,40 +1181,6 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
                     # winner[x] = "|".join(_local_wins)
                     winner[x] = _local_wins[0] + "|" + _local_wins[1]
 
-            # if x == 0:
-
-            #     dealer_sum = arrGamePlayers[x].get_card_sum()
-
-            # else:
-
-            #     player_sum = arrGamePlayers[x].get_card_sum()
-
-            # if x > 0:
-
-            #     if winner[x] == "STAND":
-
-            #         if dealer_sum == player_sum:
-            #             winner[x] = "PUSH"
-
-            #         elif dealer_sum > player_sum:
-            #             winner[x] = "DEALER"
-
-            #             if ctUSE_BETTING is True:
-            #                 arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-            #                 arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
-
-            #         elif dealer_sum < player_sum:
-            #             winner[x] = "PLAYER"
-
-            #             if ctUSE_BETTING is True:
-            #                 arrGamePlayers[0].final_money = arrGamePlayers[0].final_money - arrGamePlayers[x].actual_bet
-            #                 arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
-
-            #     elif winner[x] == "DEALER":
-
-            #         if ctUSE_BETTING is True:
-            #             arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-            #             arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
     ls("Player FINAL hand:", player.print_hand(), player.get_card_sum())
     ls("dealer  FINAL hand:", dealer.print_hand(), dealer.get_card_sum())
