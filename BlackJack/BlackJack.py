@@ -46,6 +46,15 @@
 # - TODO: Implement pays more when blackjack (natural)
 # - TODO: Add SEVERAL small rules that can be found in https://en.wikipedia.org/wiki/Blackjack
 #
+# - FIX: -- Bug: when using more then 1 player, there is money vanishing from the game.
+#           The final reminder is less then zero. Something is wrong. With 1 player everything is ok even in 100000 games.
+#           Must sim several games for bug appear. 2 players with 1000 games and the bu appear.
+#           This bug is related to splitting. If i dont use it, there is no bug
+#
+# - FIX: --  There are sometimes when i try to pop a card from the current deck, but
+#            as there are so many players (in games with >30 players) that there is no card to pop
+#            need to implement a wat to detect there is no card and create a new current deck. Probably have to make current deck a global var
+#
 # RULES and DETAILS:
 # ==================
 #
@@ -92,7 +101,7 @@ ctNUM_PLAYERS = 1
 ctSTRAT_ALGORITM = "BJ_BASIC_STRAT_FULL"
 
 # Number of maches being simulated
-ctNUM_MATCHES = 30000
+ctNUM_MATCHES = 10000
 
 # Number of complete decks of cards in play. When there are only 20% of cards in the combined decks, the dealer get a new set of decks and shuffle them
 ctNUM_OF_DECKS = 6
@@ -120,7 +129,7 @@ ctHIT_ON_SOFT_HAND = False
 ctALLOW_SPLITTING = True
 
 # Enable the player to double the bet in some situations.
-ctALLOW_DOUBLE = True
+ctALLOW_DOUBLE = False
 
 # Enable the player to surrender in some situations.
 ctALLOW_SURRENDER = False
@@ -573,8 +582,8 @@ def simulate_matches(params: list, index_proc: int = -1, return_dict: list = Non
     total_win_dealer = [0 for _ in range(0, num_players)]
     total_win_push = [0 for _ in range(0, num_players)]
 
-    # if the number of players (plus dealer) times 6 cards each is more then the avaliable cards, incrise deck number to support the game
-    if (num_players + 1) * 6 >= ctNUM_OF_DECKS * 54:
+    # if the number of players (plus dealer) times 9 cards each is more then the avaliable cards, incrise deck number to support the game
+    if (num_players + 1) * 9 >= ctNUM_OF_DECKS * 54:
         ctNUM_OF_DECKS = int((num_players + 1) * 6) + 1
         print("To many players. Increasing deck numeber to " + str(ctNUM_OF_DECKS))
 
@@ -724,7 +733,7 @@ def simulate_matches(params: list, index_proc: int = -1, return_dict: list = Non
 
                 reminder = reminder - round(aGamePlayers[conta_player].start_money, 2)
 
-            print("rem = " + str(reminder))
+            print("reminder = " + str(reminder))
 
         print("")
 
@@ -1132,7 +1141,15 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                 if ctUSE_BETTING is True:
                                     # arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
-                                    arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+                                    # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+
+                                    if _win_count == 0:
+                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet
+                                        # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
+
+                                    elif _win_count == 1:
+                                        arrGamePlayers[x].final_money = arrGamePlayers[x].final_money + arrGamePlayers[x].actual_bet_splitted
+                                        # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
 
 
                             elif dealer_sum > player_sum:
@@ -1167,11 +1184,11 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                                 _local_wins.append("DEALER")
 
-                                if _win_count == 1:
+                                if _win_count == 0:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet
                                     # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet
 
-                                elif _win_count == 2:
+                                elif _win_count == 1:
                                     arrGamePlayers[0].final_money = arrGamePlayers[0].final_money + arrGamePlayers[x].actual_bet_splitted
                                     # arrGamePlayers[x].final_money = arrGamePlayers[x].final_money - arrGamePlayers[x].actual_bet_splitted
 
@@ -1223,6 +1240,8 @@ def get_card_from_deck(deck: list, forceValue: str = None) -> list:
     """
     hummm ... get a new card from the deck ?
     """
+    # if deck == []:
+    #     current_deck = new_deck(number_of_decks_used=ctNUM_OF_DECKS)
 
     if forceValue is None:
         return deck.pop()
