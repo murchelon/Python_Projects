@@ -120,7 +120,7 @@ ctPROCESSING_MODE = "NORMAL"
 ctNUM_SIMULTANEOUS_TASKS = 2
 
 # Precision of the numbers, when returning the statistics. Its rounded to the number of decimals defined here
-ctNUM_PRECISION = 8
+ctNUM_PRECISION = 10 # arround 46 max
 
 # Dealer must hit on soft 17 (when have an ACE and a 6) ? If not, will hit when sum of cards <= 16, else hit on <= 17 if have an ACE or hit when <= 16 when doesnt have an ACE
 ctHIT_ON_SOFT_HAND = False
@@ -273,44 +273,6 @@ class GamePlayer:
 
         return sum_
 
-
-
-    def get_card_sum_OLD(self, _hand_number: int = 0) -> int:
-
-        if ctALLOW_SPLITTING:
-            if _hand_number == 0:
-                cards = self.cards
-            else:
-                cards = self.cards_splitted
-        else:
-            cards = self.cards
-
-        num_of_aces = len([x[0] for x in cards if x[0] == "A"])
-
-        if num_of_aces <= 1:
-
-            value_for_ace = 11
-
-            for card in cards:
-
-                if get_card_val(card[0]) >= 11:
-                    value_for_ace = 1
-
-        else:
-            value_for_ace = 1
-
-        sum_ = 0
-
-        for card in cards:
-
-            if get_card_val(card[0]) == 1:
-
-                sum_ += value_for_ace
-
-            else:
-                sum_ += get_card_val(card[0])
-
-        return sum_
 
     def get_next_action(self, _force: str = None, _hand_number: int = 0) -> str:
 
