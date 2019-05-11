@@ -858,12 +858,16 @@ def run_match(deck: list, arrGamePlayers: object) -> list:
 
                         if ctUSE_BETTING is True:
 
+                            if total_hands_number > 0:
+                                # print("teste")
+                                pass
+
                             if hand == 0:
                                 player.final_money = player.final_money - player.actual_bet
                                 player.actual_bet = player.actual_bet * 2
 
                             else:
-                                player.final_money = player.final_money - player.actual_bet
+                                player.final_money = player.final_money - player.actual_bet_splitted
                                 player.actual_bet_splitted = player.actual_bet_splitted * 2
 
                             player.hit(_deck_used=deck, _hand_number=hand)
