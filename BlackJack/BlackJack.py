@@ -97,10 +97,11 @@ import BlackJack_BetAlg as bet_alg
 ctNUM_PLAYERS = 1
 
 # Define the strategy algoritm. All players use the same. Dealer uses its won.
+# ["NEVER", "ALWAYS", "50X50", "BJ_BASIC_STRAT_FULL", "BJ_BASIC_STRAT_NOSPLIT_NODOUBLE", "MURCH", "DEALER"]
 ctSTRAT_ALGORITM = "BJ_BASIC_STRAT_FULL"
 
 # Number of maches being simulated
-ctNUM_MATCHES = 1
+ctNUM_MATCHES = 10000
 
 # Number of complete decks of cards in play. When there are only 20% of cards in the combined decks, the dealer get a new set of decks and shuffle them
 ctNUM_OF_DECKS = 6
@@ -131,7 +132,7 @@ ctALLOW_SPLITTING = True
 ctALLOW_DOUBLE = True
 
 # Enable the player to surrender in some situations.
-ctALLOW_SURRENDER = False
+ctALLOW_SURRENDER = True
 
 # Sets the moment when the deck being used is discarded and the dealer gets new shuffled decks.
 # Define the percentual from the decks being used with remaining cards. If its set to 0.2 it means the game will
@@ -515,12 +516,14 @@ def run_simulation_project(num_matches: int = 1, processing_mode: str = "NORMAL"
     mask = "{:." + str(ctNUM_PRECISION) + "f}"
     # mask.format(win_ratio_final[0])
 
-    formated_result = mask.format(win_ratio_final[0]), mask.format(win_ratio_final[1]), mask.format(win_ratio_final[2])
+    if ctALLOW_SURRENDER:
+        formated_result = mask.format(win_ratio_final[0]), mask.format(win_ratio_final[1]), mask.format(win_ratio_final[2]), mask.format(win_ratio_final[3])
+        print("FINAL TOTAL Win Ratio in", ctNUM_MATCHES, "game(s) (player x dealer x push x surrender): ", formated_result)
+    else:
 
-    # formated_result = []
-    # print (mask.format(win_ratio_final[0]))
+        formated_result = mask.format(win_ratio_final[0]), mask.format(win_ratio_final[1]), mask.format(win_ratio_final[2])
 
-    print("FINAL TOTAL Win Ratio in", ctNUM_MATCHES, "game(s) (player x dealer x push): ", formated_result)
+        print("FINAL TOTAL Win Ratio in", ctNUM_MATCHES, "game(s) (player x dealer x push): ", formated_result)
 
 
 def simulate_matches(params: list, index_proc: int = -1, return_dict: list = None) -> list:
