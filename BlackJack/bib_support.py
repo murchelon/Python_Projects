@@ -36,11 +36,16 @@ def ls(val_to_print, *args) -> None:
     :param args:
     :return:
     """
+
+
+
     if gDebugMode == True:
         print(val_to_print, *args)
 
 
 def print_inline(data: str, newline: bool = False) -> None:
+
+    # pass
 
     stdout.write("\r%s" % data)
     stdout.flush()

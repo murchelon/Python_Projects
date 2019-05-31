@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bc13020c-68e4-4ac6-a07c-fa3f08859b3f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlackJack.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlackJack.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bib_support.py" beforeDir="false" afterPath="$PROJECT_DIR$/bib_support.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,26 +17,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BlackJack.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="98" column="17" selection-start-line="98" selection-start-column="17" selection-end-line="98" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" selection-start-line="17" selection-end-line="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="1734" selection-start-line="1734" selection-end-line="1734" />
+            <state relative-caret-position="334">
+              <caret line="133" column="25" selection-start-line="133" selection-start-column="25" selection-end-line="133" selection-end-column="25" />
+              <folding>
+                <element signature="e#4907#4927#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -42,8 +29,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="138">
-              <caret line="576" selection-start-line="576" selection-end-line="576" />
+            <state relative-caret-position="168">
+              <caret line="557" column="23" selection-start-line="557" selection-start-column="23" selection-end-line="557" selection-end-column="23" />
               <folding>
                 <element signature="e#1#21#0" expanded="true" />
               </folding>
@@ -54,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BlackJack_BetAlg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" selection-start-line="4" selection-end-line="4" />
+            <state relative-caret-position="150">
+              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
             </state>
           </provider>
         </entry>
@@ -63,8 +50,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bib_support.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="28" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="88">
+              <caret line="35" column="16" lean-forward="true" selection-start-line="35" selection-start-column="16" selection-end-line="35" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -80,29 +67,7 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>curre</find>
-      <find>splitin</find>
-      <find>splited</find>
-      <find>should_hit</find>
-      <find>shuff</find>
-      <find>run_match</find>
-      <find>winner</find>
-      <find>player.cards_splitted =</find>
-      <find>cards_splitted</find>
-      <find>get_next_action</find>
-      <find>get_card_sum</find>
-      <find>cards_splited</find>
-      <find>splited_results</find>
-      <find>|</find>
-      <find>_local_wins[0]</find>
-      <find>speed</find>
-      <find>RealTime</find>
-      <find>hit_on_soft</find>
-      <find>FINAL TOTAL Win Ratio</find>
-      <find>betting</find>
-      <find>balance</find>
       <find>use_bet</find>
-      <find>ctUSE_BETTING</find>
       <find>True</find>
       <find>rem</find>
       <find>rem =</find>
@@ -110,6 +75,28 @@
       <find>get_card_from_deck</find>
       <find>new_de</find>
       <find>current_deck</find>
+      <find>x &gt;</find>
+      <find>ctUSE_BETTING</find>
+      <find>remind</find>
+      <find>print(&quot;reminder = &quot; + str(reminder))</find>
+      <find>use_bett</find>
+      <find>blow</find>
+      <find>join</find>
+      <find>splited_results</find>
+      <find>winner</find>
+      <find>|</find>
+      <find>STAND|</find>
+      <find>winner.append(splited</find>
+      <find>print</find>
+      <find>insert</find>
+      <find>reminder =</find>
+      <find>print(&quot;remi</find>
+      <find>Proc1</find>
+      <find>teste</find>
+      <find>print_inline</find>
+      <find>reminder</find>
+      <find>total_hands_number</find>
+      <find>pass</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -120,16 +107,17 @@
       <list>
         <option value="$PROJECT_DIR$/Main.py" />
         <option value="$PROJECT_DIR$/Main2.py" />
-        <option value="$PROJECT_DIR$/bib_support.py" />
         <option value="$PROJECT_DIR$/BlackJack_BetAlg.py" />
         <option value="$PROJECT_DIR$/Anottations.txt" />
         <option value="$PROJECT_DIR$/BlackJack_Alg.py" />
+        <option value="$PROJECT_DIR$/bib_support.py" />
         <option value="$PROJECT_DIR$/BlackJack.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="y" value="22" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-1" />
+    <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="874" />
   </component>
@@ -139,6 +127,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -150,7 +139,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -246,23 +234,23 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="22" width="1438" height="874" extended-state="6" />
+    <frame x="-1" y="23" width="1440" height="874" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49187434" visible="true" weight="0.14043754" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49187434" visible="true" weight="0.14023961" />
       <window_info id="Structure" order="1" sideWeight="0.5092308" side_tool="true" weight="0.14646997" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.27493605" />
       <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4982382" visible="true" weight="0.33120206" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.40409207" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49964714" weight="0.36445013" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49964765" weight="0.32992327" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49964765" weight="0.32992327" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32992327" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5017618" side_tool="true" weight="0.29795396" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32992327" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50035286" side_tool="true" weight="0.40409207" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.4982357" weight="0.32992327" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -271,29 +259,84 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/BlackJack_Alg.py</url>
           <line>723</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/BlackJack.py</url>
-          <line>861</line>
-          <option name="timeStamp" value="69" />
+          <line>1404</line>
+          <option name="timeStamp" value="109" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="arrGamePlayers[0].final_money" />
-        <watch expression="arrGamePlayers[1].final_money" />
+        <watch expression="arrGamePlayers[1].final_money" language="Python" />
         <watch expression="arrGamePlayers[1].actual_bet" />
         <watch expression="arrGamePlayers[1].actual_bet_splitted" />
+        <watch expression="arrGamePlayers[2].final_money" language="Python" />
+        <watch expression="arrGamePlayers[2].actual_bet" language="Python" />
+        <watch expression="arrGamePlayers[2].actual_bet_splitted" language="Python" />
+        <watch expression="reminder" language="Python" />
+        <watch expression="x" />
+        <watch expression="winner" />
+        <watch expression="_win_count" language="Python" />
+        <watch expression="_local_wins" language="Python" />
+        <watch expression="len(winner)" language="Python" />
+        <watch expression="splited_results" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>splited_results</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>len(winner)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>_local_wins</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>_win_count</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>arrGamePlayers[2].actual_bet</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>reminder</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>arrGamePlayers[2].actual_bet_splitted</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>arrGamePlayers[2].final_money</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>arrGamePlayers[1].final_money</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>value_for_ace</expression-string>
         <language-id>Python</language-id>
@@ -354,27 +397,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/BlackJack_BetAlg.py">
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bib_support.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="576" selection-start-line="576" selection-end-line="576" />
-          <folding>
-            <element signature="e#1#21#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="234">
+          <caret line="1734" selection-start-line="1734" selection-end-line="1734" />
         </state>
       </provider>
     </entry>
@@ -385,17 +411,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+    <entry file="file://$PROJECT_DIR$/BlackJack_Alg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="1734" selection-start-line="1734" selection-end-line="1734" />
+        <state relative-caret-position="168">
+          <caret line="557" column="23" selection-start-line="557" selection-start-column="23" selection-end-line="557" selection-end-column="23" />
+          <folding>
+            <element signature="e#1#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BlackJack_BetAlg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bib_support.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="35" column="16" lean-forward="true" selection-start-line="35" selection-start-column="16" selection-end-line="35" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/BlackJack.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="98" column="17" selection-start-line="98" selection-start-column="17" selection-end-line="98" selection-end-column="17" />
+        <state relative-caret-position="334">
+          <caret line="133" column="25" selection-start-line="133" selection-start-column="25" selection-end-line="133" selection-end-column="25" />
+          <folding>
+            <element signature="e#4907#4927#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
